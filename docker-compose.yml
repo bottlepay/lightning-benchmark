@@ -25,12 +25,6 @@ services:
       - lnd-bob:/cfg
     command: --tlsextradomain=lnd-bob
 
-  control:
-    image: alpine
-    volumes:
-      - lnd-alice:/lnd-alice
-      - lnd-bob:/lnd-bob
-
   loadtest:
     build: loadtest
     depends_on:
