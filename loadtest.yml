@@ -1,0 +1,16 @@
+bitcoind:
+  host: bitcoind:8332
+  user: test
+  pass: test
+sender:
+  lnd:
+    tlsCertPath: /lnd-alice/tls.cert
+    host: lnd-alice:9735
+    rpcHost: lnd-alice:10009
+    macaroonPath: /lnd-alice/admin.macaroon
+receiver:
+  lnd:
+    tlsCertPath: /lnd-bob/tls.cert
+    host: lnd-bob:9735
+    rpcHost: lnd-bob:10009
+    macaroonPath: /lnd-bob/admin.macaroon

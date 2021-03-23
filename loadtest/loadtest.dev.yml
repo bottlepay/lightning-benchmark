@@ -1,0 +1,16 @@
+bitcoind:
+  host: localhost:9000
+  user: joost
+  pass: joost
+sender:
+  lnd:
+    tlsCertPath: /home/joost/.lnd/tls.cert
+    host: localhost:10003
+    rpcHost: localhost:10013
+    macaroonPath: /home/joost/.lnd-charlie/data/chain/bitcoin/regtest/admin.macaroon
+receiver:
+  lnd:
+    tlsCertPath: /home/joost/.lnd/tls.cert
+    host: localhost:10002
+    rpcHost: localhost:10012
+    macaroonPath: /home/joost/.lnd-bob/data/chain/bitcoin/regtest/admin.macaroon

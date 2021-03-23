@@ -1,0 +1,48 @@
+version: '3.4'
+services:
+  bitcoind:
+    image: kylemanna/bitcoind
+    volumes:
+      - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+
+  lnd-alice:
+    restart: unless-stopped
+    image: lightninglabs/lnd:v0.12.1-beta
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-alice:/cfg
+    command: --tlsextradomain=lnd-alice
+
+  lnd-bob:
+    restart: unless-stopped
+    image: lightninglabs/lnd:v0.12.1-beta
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-bob:/cfg
+    command: --tlsextradomain=lnd-bob
+
+  control:
+    image: alpine
+    volumes:
+      - lnd-alice:/lnd-alice
+      - lnd-bob:/lnd-bob
+
+  loadtest:
+    build: loadtest
+    depends_on:
+      - lnd-alice
+      - lnd-bob
+    volumes:
+      - lnd-alice:/lnd-alice
+      - lnd-bob:/lnd-bob
+      - ./loadtest.yml:/loadtest.yml
+ 
+
+volumes:
+  lnd-alice:
+  lnd-bob:
+    
