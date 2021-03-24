@@ -40,6 +40,8 @@ services:
     volumes:
       - ./lnd.conf:/root/.lnd/lnd.conf
       - lnd-alice:/cfg
+    ports:
+      - 5000:5000      
     command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.insecure_skip_verify
 
   lnd-bob:
@@ -55,6 +57,8 @@ services:
     volumes:
       - ./lnd.conf:/root/.lnd/lnd.conf
       - lnd-bob:/cfg
+    ports:
+      - 5001:5000      
     command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.insecure_skip_verify
 
   loadtest:
