@@ -1,15 +1,11 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"io/ioutil"
 	"os"
 	"sync"
 	"time"
 
-	"github.com/lightningnetwork/lnd/lnrpc"
-	"github.com/lightningnetwork/lnd/lnrpc/routerrpc"
 	"github.com/urfave/cli"
 	"gopkg.in/yaml.v2"
 )
@@ -74,49 +70,28 @@ func load(_ *cli.Context) error {
 }
 
 func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig, amtMsat int64) error {
-	senderConn, err := getClientConn(&senderCfg.Lnd)
+	senderClient, err := getLndConnection(&senderCfg.Lnd)
 	if err != nil {
 		return err
 	}
-	defer senderConn.Close()
-	senderClient := routerrpc.NewRouterClient(senderConn)
+	defer senderClient.Close()
 
-	receiverConn, err := getClientConn(&receiverCfg.Lnd)
+	receiverClient, err := getLndConnection(&receiverCfg.Lnd)
 	if err != nil {
 		return err
 	}
-	defer receiverConn.Close()
-	receiverClient := lnrpc.NewLightningClient(receiverConn)
+	defer receiverClient.Close()
 
 	send := func() error {
-		addResp, err := receiverClient.AddInvoice(context.Background(), &lnrpc.Invoice{
-			ValueMsat: amtMsat,
-		})
+		invoice, err := receiverClient.AddInvoice(amtMsat)
 		if err != nil {
 			return err
 		}
-		invoice := addResp.PaymentRequest
 
-		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
-
-		stream, err := senderClient.SendPayment(ctx, &routerrpc.SendPaymentRequest{
-			PaymentRequest:    invoice,
-			TimeoutSeconds:    60,
-			NoInflightUpdates: true,
-		})
+		err = senderClient.SendPayment(invoice)
 		if err != nil {
 			log.Errorw("Error sending payment", "err", err)
 			return err
-		}
-
-		update, err := stream.Recv()
-		if err != nil {
-			return err
-		}
-
-		if update.State != routerrpc.PaymentState_SUCCEEDED {
-			return errors.New("payment failed")
 		}
 
 		settledChan <- struct{}{}

@@ -1,16 +1,13 @@
 package main
 
 import (
-	"context"
 	"io/ioutil"
 	"time"
 
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/btcsuite/btcutil"
-	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/urfave/cli"
-	"google.golang.org/grpc"
 	"gopkg.in/yaml.v2"
 )
 
@@ -52,39 +49,6 @@ func getBitcoindConnection(cfg *bitcoindConfig) (*rpcclient.Client, error) {
 	}
 }
 
-func getLndConnection(cfg *lndConfig) (*grpc.ClientConn, error) {
-	connLogger := log.With("host", cfg.RpcHost)
-	senderConn, err := getClientConn(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	senderClient := lnrpc.NewLightningClient(senderConn)
-	var attempt int
-	for {
-		attempt++
-		logger := connLogger.With("attempt", attempt)
-
-		logger.Infow("Attempting to connect to lnd")
-
-		resp, err := senderClient.GetInfo(context.Background(), &lnrpc.GetInfoRequest{})
-		if err == nil {
-			if !resp.SyncedToChain {
-				log.Infow("Not synced to chain yet")
-				time.Sleep(time.Second)
-
-				continue
-			}
-
-			logger.Infow("Connected to lnd", "key", resp.IdentityPubkey)
-			return senderConn, nil
-		}
-
-		logger.Infow("Lnd connection attempt failed", "err", err)
-		time.Sleep(time.Second)
-	}
-}
-
 func setup(_ *cli.Context) error {
 	yamlFile, err := ioutil.ReadFile("loadtest.yml")
 	if err != nil {
@@ -115,19 +79,16 @@ func setup(_ *cli.Context) error {
 	}
 
 	log.Infow("Fund sender")
-	senderConn, err := getLndConnection(&cfg.Sender.Lnd)
+	senderClient, err := getLndConnection(&cfg.Sender.Lnd)
 	if err != nil {
 		return err
 	}
-	defer senderConn.Close()
-	senderClient := lnrpc.NewLightningClient(senderConn)
-	addrResp, err := senderClient.NewAddress(context.Background(), &lnrpc.NewAddressRequest{
-		Type: lnrpc.AddressType_WITNESS_PUBKEY_HASH,
-	})
+	defer senderClient.Close()
+	addrResp, err := senderClient.NewAddress()
 	if err != nil {
 		return err
 	}
-	senderAddr, err := btcutil.DecodeAddress(addrResp.Address, &chaincfg.RegressionNetParams)
+	senderAddr, err := btcutil.DecodeAddress(addrResp, &chaincfg.RegressionNetParams)
 	if err != nil {
 		return err
 	}
@@ -142,36 +103,27 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
-	receiverConn, err := getLndConnection(&cfg.Receiver.Lnd)
+	receiverClient, err := getLndConnection(&cfg.Receiver.Lnd)
 	if err != nil {
 		return err
 	}
-	defer receiverConn.Close()
-	receiverClient := lnrpc.NewLightningClient(receiverConn)
+	defer receiverClient.Close()
 
-	infoResp, err := receiverClient.GetInfo(context.Background(), &lnrpc.GetInfoRequest{})
+	infoResp, err := receiverClient.GetInfo()
 	if err != nil {
 		return err
 	}
-	receiverKey := infoResp.IdentityPubkey
+	receiverKey := infoResp.key
 	log.Infow("Receiver info", "pubkey", receiverKey)
 
 	log.Infow("Connecting peers")
-	_, err = senderClient.ConnectPeer(context.Background(), &lnrpc.ConnectPeerRequest{
-		Addr: &lnrpc.LightningAddress{
-			Host:   cfg.Receiver.Lnd.Host,
-			Pubkey: receiverKey,
-		},
-	})
+	err = senderClient.Connect(receiverKey, cfg.Receiver.Lnd.Host)
 	if err != nil {
 		return err
 	}
 
 	log.Infow("Open channel")
-	_, err = senderClient.OpenChannelSync(context.Background(), &lnrpc.OpenChannelRequest{
-		LocalFundingAmount: 10000000,
-		NodePubkeyString:   receiverKey,
-	})
+	err = senderClient.OpenChannel(receiverKey, 10000000)
 	if err != nil {
 		return err
 	}
@@ -184,10 +136,11 @@ func setup(_ *cli.Context) error {
 
 	log.Infow("Waiting for channel to become active")
 	for {
-		resp, err := senderClient.ListChannels(context.Background(), &lnrpc.ListChannelsRequest{
-			ActiveOnly: true,
-		})
-		if err == nil && len(resp.Channels) > 0 {
+		activeChannels, err := senderClient.HasActiveChannels()
+		if err != nil {
+			return err
+		}
+		if activeChannels {
 			break
 		}
 		time.Sleep(time.Second)
