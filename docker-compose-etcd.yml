@@ -1,0 +1,73 @@
+version: '3.4'
+services:
+  bitcoind:
+    image: kylemanna/bitcoind
+    volumes:
+      - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+
+  etcd-alice:
+    restart: unless-stopped
+    image: 'bitnami/etcd:3.3.10'
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_MAX_TXN_OPS=16384
+      - ETCD_MAX_REQUEST_BYTES=104857600
+      - ETCD_AUTO_TLS=true
+
+  etcd-bob:
+    restart: unless-stopped
+    image: 'bitnami/etcd:3.3.10'
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_MAX_TXN_OPS=16384
+      - ETCD_MAX_REQUEST_BYTES=104857600
+      - ETCD_AUTO_TLS=true
+
+  lnd-alice:
+    restart: unless-stopped
+    build: 
+      context: lnd
+      args:
+        checkout: v0.12.1-beta
+        tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
+    depends_on:
+      - bitcoind
+      - etcd-alice
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-alice:/cfg
+    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.insecure_skip_verify
+
+  lnd-bob:
+    restart: unless-stopped
+    build: 
+      context: lnd
+      args:
+        checkout: v0.12.1-beta
+        tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
+    depends_on:
+      - bitcoind
+      - etcd-bob
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-bob:/cfg
+    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.insecure_skip_verify
+
+  loadtest:
+    build: loadtest
+    depends_on:
+      - lnd-alice
+      - lnd-bob
+    volumes:
+      - lnd-alice:/lnd-alice
+      - lnd-bob:/lnd-bob
+      - ./loadtest.yml:/loadtest.yml
+ 
+volumes:
+  lnd-alice:
+  lnd-bob:
+    

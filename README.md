@@ -12,8 +12,12 @@ Output is the number of transaction that are settled per second (TPS).
 
 ## How to run
 
-`docker-compose down -v && docker-compose up --build | grep loadtest`
+With bbolt database backend: `./run.sh docker-compose-bbolt.yml`
 
-The `down` command makes sure that all leftovers from a previous run are
-removed. `up` will then spin up the stack and output logs as a foreground
-process. Grep filters the output to only show the test results.
+With etcd database backend: `./run.sh docker-compose-etcd.yml`
+
+## Configuration
+
+In the file `loadtest.yml` the following test parameters can be set:
+* `paymentAmountMsat`: the test amount that is paid
+* `processes`: the number of parallel processes

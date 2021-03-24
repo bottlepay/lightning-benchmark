@@ -35,7 +35,6 @@ services:
       - lnd-bob:/lnd-bob
       - ./loadtest.yml:/loadtest.yml
  
-
 volumes:
   lnd-alice:
   lnd-bob:
