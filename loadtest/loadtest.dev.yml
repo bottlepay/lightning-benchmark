@@ -5,12 +5,14 @@ bitcoind:
 sender:
   lnd:
     tlsCertPath: /home/joost/.lnd/tls.cert
-    host: localhost:10003
-    rpcHost: localhost:10013
+    host: localhost:10013
+    rpcHost: localhost:10003
     macaroonPath: /home/joost/.lnd-charlie/data/chain/bitcoin/regtest/admin.macaroon
 receiver:
   lnd:
     tlsCertPath: /home/joost/.lnd/tls.cert
-    host: localhost:10002
-    rpcHost: localhost:10012
+    host: localhost:10012
+    rpcHost: localhost:10002
     macaroonPath: /home/joost/.lnd-bob/data/chain/bitcoin/regtest/admin.macaroon
+paymentAmountMsat: 1000
+processes: 100

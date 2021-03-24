@@ -14,11 +14,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const (
-	// The number of concurrent payment processes.
-	concurrency = 100
-)
-
 var settledChan = make(chan struct{})
 
 var loadCommand = cli.Command{
@@ -38,13 +33,16 @@ func load(_ *cli.Context) error {
 		return err
 	}
 
+	log.Infow("Starting payment processes",
+		"process_count", cfg.Processes, "amt_msat", cfg.PaymentAmountMsat)
+
 	var wg sync.WaitGroup
-	for t := 0; t < concurrency; t++ {
+	for t := 0; t < cfg.Processes; t++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 
-			err := loadThread(&cfg.Sender, &cfg.Receiver)
+			err := loadThread(&cfg.Sender, &cfg.Receiver, cfg.PaymentAmountMsat)
 			if err != nil {
 				log.Errorw("Send error", "err", err)
 				os.Exit(1)
@@ -75,7 +73,7 @@ func load(_ *cli.Context) error {
 	return nil
 }
 
-func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig) error {
+func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig, amtMsat int64) error {
 	senderConn, err := getClientConn(&senderCfg.Lnd)
 	if err != nil {
 		return err
@@ -92,7 +90,7 @@ func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig) error {
 
 	send := func() error {
 		addResp, err := receiverClient.AddInvoice(context.Background(), &lnrpc.Invoice{
-			Value: 1,
+			ValueMsat: amtMsat,
 		})
 		if err != nil {
 			return err

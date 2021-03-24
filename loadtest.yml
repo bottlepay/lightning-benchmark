@@ -14,3 +14,5 @@ receiver:
     host: lnd-bob:9735
     rpcHost: lnd-bob:10009
     macaroonPath: /lnd-bob/admin.macaroon
+paymentAmountMsat: 1000
+processes: 100

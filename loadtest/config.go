@@ -18,7 +18,9 @@ type bitcoindConfig struct {
 }
 
 type config struct {
-	Sender   clientConfig   `yaml:"sender"`
-	Receiver clientConfig   `yaml:"receiver"`
-	Bitcoind bitcoindConfig `yaml:"bitcoind"`
+	Sender            clientConfig   `yaml:"sender"`
+	Receiver          clientConfig   `yaml:"receiver"`
+	Bitcoind          bitcoindConfig `yaml:"bitcoind"`
+	PaymentAmountMsat int64          `yaml:"paymentAmountMsat"`
+	Processes         int
 }
