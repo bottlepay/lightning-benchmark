@@ -1,14 +1,12 @@
 package main
 
 import (
-	"io/ioutil"
 	"time"
 
 	"github.com/btcsuite/btcd/chaincfg"
 	"github.com/btcsuite/btcd/rpcclient"
 	"github.com/btcsuite/btcutil"
 	"github.com/urfave/cli"
-	"gopkg.in/yaml.v2"
 )
 
 var setupCommand = cli.Command{
@@ -33,30 +31,21 @@ func getBitcoindConnection(cfg *bitcoindConfig) (*rpcclient.Client, error) {
 		return nil, err
 	}
 
-	var attempt int
-	for {
-		attempt++
-		log.Infow("Attempting to connect to bitcoind", "attempt", attempt)
+	log.Infow("Attempting to connect to bitcoind")
 
+	for {
 		_, err := bitcoindConn.GetBlockChainInfo()
 		if err == nil {
 			log.Infow("Connected to bitcoind")
 			return bitcoindConn, nil
 		}
 
-		log.Infow("Bitcoind connection attempt failed", "err", err)
 		time.Sleep(time.Second)
 	}
 }
 
 func setup(_ *cli.Context) error {
-	yamlFile, err := ioutil.ReadFile("loadtest.yml")
-	if err != nil {
-		return err
-	}
-
-	var cfg config
-	err = yaml.UnmarshalStrict(yamlFile, &cfg)
+	cfg, err := loadConfig()
 	if err != nil {
 		return err
 	}
@@ -122,30 +111,32 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
-	log.Infow("Open channel")
-	err = senderClient.OpenChannel(receiverKey, 10000000)
-	if err != nil {
-		return err
+	log.Infow("Open channels", "channel_count", cfg.Channels, "capacity_sat", cfg.ChannelCapacitySat)
+	for i := 0; i < cfg.Channels; i++ {
+		err = senderClient.OpenChannel(receiverKey, cfg.ChannelCapacitySat)
+		if err != nil {
+			return err
+		}
 	}
 
-	log.Infow("Confirm channel")
+	log.Infow("Confirm channels")
 	_, err = bitcoindConn.GenerateToAddress(6, addr, nil)
 	if err != nil {
 		return err
 	}
 
-	log.Infow("Waiting for channel to become active")
+	log.Infow("Waiting for channels to become active")
 	for {
-		activeChannels, err := senderClient.HasActiveChannels()
+		activeChannels, err := senderClient.ActiveChannels()
 		if err != nil {
 			return err
 		}
-		if activeChannels {
+		if activeChannels == cfg.Channels {
 			break
 		}
 		time.Sleep(time.Second)
 	}
 
-	log.Infow("Channel active")
+	log.Infow("Channels active")
 	return nil
 }

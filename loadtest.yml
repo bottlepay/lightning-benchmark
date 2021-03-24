@@ -16,3 +16,5 @@ receiver:
     macaroonPath: /lnd-bob/admin.macaroon
 paymentAmountMsat: 1000
 processes: 100
+channels: 10
+channelCapacitySat: 10000000

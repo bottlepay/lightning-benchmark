@@ -17,35 +17,28 @@ type lndConnection struct {
 }
 
 func getLndConnection(cfg *lndConfig) (*lndConnection, error) {
-	connLogger := log.With("host", cfg.RpcHost)
+	logger := log.With("host", cfg.RpcHost)
 	senderConn, err := getClientConn(cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	senderClient := lnrpc.NewLightningClient(senderConn)
-	var attempt int
 
+	logger.Infow("Attempting to connect to lnd")
 	for {
-		attempt++
-		logger := connLogger.With("attempt", attempt)
-
-		logger.Infow("Attempting to connect to lnd")
-
 		resp, err := senderClient.GetInfo(context.Background(), &lnrpc.GetInfoRequest{})
 		if err == nil {
 			if !resp.SyncedToChain {
-				logger.Infow("Not synced to chain yet")
 				time.Sleep(time.Second)
 
 				continue
 			}
 
-			connLogger.Infow("Connected to lnd", "key", resp.IdentityPubkey)
+			logger.Infow("Connected to lnd", "key", resp.IdentityPubkey)
 			break
 		}
 
-		logger.Infow("Lnd connection attempt failed", "err", err)
 		time.Sleep(time.Second)
 	}
 
@@ -102,18 +95,19 @@ func (l *lndConnection) OpenChannel(peerKey string, amtSat int64) error {
 	_, err := l.lightningClient.OpenChannelSync(context.Background(), &lnrpc.OpenChannelRequest{
 		LocalFundingAmount: amtSat,
 		NodePubkeyString:   peerKey,
+		SpendUnconfirmed:   true,
 	})
 	return err
 }
 
-func (l *lndConnection) HasActiveChannels() (bool, error) {
+func (l *lndConnection) ActiveChannels() (int, error) {
 	resp, err := l.lightningClient.ListChannels(context.Background(), &lnrpc.ListChannelsRequest{
 		ActiveOnly: true,
 	})
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	return len(resp.Channels) > 0, nil
+	return len(resp.Channels), nil
 }
 
 func (l *lndConnection) AddInvoice(amtMsat int64) (string, error) {

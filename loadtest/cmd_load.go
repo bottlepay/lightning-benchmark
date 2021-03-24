@@ -1,13 +1,11 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/urfave/cli"
-	"gopkg.in/yaml.v2"
 )
 
 var settledChan = make(chan struct{})
@@ -18,13 +16,7 @@ var loadCommand = cli.Command{
 }
 
 func load(_ *cli.Context) error {
-	yamlFile, err := ioutil.ReadFile("loadtest.yml")
-	if err != nil {
-		return err
-	}
-
-	var cfg config
-	err = yaml.UnmarshalStrict(yamlFile, &cfg)
+	cfg, err := loadConfig()
 	if err != nil {
 		return err
 	}
