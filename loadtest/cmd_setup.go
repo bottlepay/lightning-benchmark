@@ -111,6 +111,8 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
+	// Open channels. Because the sender will always choose the channel with
+	// the highest balance, the channel will be utilized roughly equally.
 	log.Infow("Open channels", "channel_count", cfg.Channels, "capacity_sat", cfg.ChannelCapacitySat)
 	for i := 0; i < cfg.Channels; i++ {
 		err = senderClient.OpenChannel(receiverKey, cfg.ChannelCapacitySat)

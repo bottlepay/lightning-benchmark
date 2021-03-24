@@ -3,7 +3,7 @@
 This repository contains a load test for `lnd`.
 
 The test creates a setup with a bitcoind regtest node and two lnd instances that
-share a single channel between them. 
+share a 10 channels between them. 
 
 A test application spins up 100 goroutines that continously request an invoice
 from one instance and pay it from the other one.
