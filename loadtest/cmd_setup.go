@@ -68,7 +68,7 @@ func setup(_ *cli.Context) error {
 	}
 
 	log.Infow("Fund sender")
-	senderClient, err := getLndConnection(&cfg.Sender.Lnd)
+	senderClient, err := getNodeConnection(&cfg.Sender)
 	if err != nil {
 		return err
 	}
@@ -87,12 +87,17 @@ func setup(_ *cli.Context) error {
 	}
 
 	log.Infow("Mature coin")
-	_, err = bitcoindConn.GenerateToAddress(100, addr, nil)
+	_, err = bitcoindConn.GenerateToAddress(105, addr, nil)
 	if err != nil {
 		return err
 	}
 
-	receiverClient, err := getLndConnection(&cfg.Receiver.Lnd)
+	log.Infow("Wait for coin to appear in wallet")
+	if err := senderClient.HasFunds(); err != nil {
+		return err
+	}
+
+	receiverClient, err := getNodeConnection(&cfg.Receiver)
 	if err != nil {
 		return err
 	}
@@ -106,7 +111,7 @@ func setup(_ *cli.Context) error {
 	log.Infow("Receiver info", "pubkey", receiverKey)
 
 	log.Infow("Connecting peers")
-	err = senderClient.Connect(receiverKey, cfg.Receiver.Lnd.Host)
+	err = senderClient.Connect(receiverKey, cfg.Receiver.Host)
 	if err != nil {
 		return err
 	}

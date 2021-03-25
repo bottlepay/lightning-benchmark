@@ -53,11 +53,6 @@ func (l *lndConnection) Close() {
 	l.conn.Close()
 }
 
-type info struct {
-	key    string
-	synced bool
-}
-
 func (l *lndConnection) GetInfo() (*info, error) {
 	infoResp, err := l.lightningClient.GetInfo(context.Background(), &lnrpc.GetInfoRequest{})
 	if err != nil {
@@ -143,4 +138,18 @@ func (l *lndConnection) SendPayment(invoice string) error {
 	}
 
 	return nil
+}
+
+func (l *lndConnection) HasFunds() error {
+	for {
+		resp, err := l.lightningClient.WalletBalance(context.Background(), &lnrpc.WalletBalanceRequest{})
+		if err != nil {
+			return err
+		}
+		if resp.ConfirmedBalance > 0 {
+			return nil
+		}
+
+		time.Sleep(time.Second)
+	}
 }

@@ -9,13 +9,13 @@ import (
 
 type lndConfig struct {
 	TlsCertPath  string `yaml:"tlsCertPath"`
-	Host         string `yaml:"host"`
 	RpcHost      string `yaml:"rpcHost"`
 	MacaroonPath string `yaml:"macaroonPath"`
 }
 
 type clientConfig struct {
-	Lnd lndConfig `yaml:"lnd"`
+	Lnd  *lndConfig `yaml:"lnd"`
+	Host string     `yaml:"host"`
 }
 
 type bitcoindConfig struct {

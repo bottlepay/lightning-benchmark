@@ -62,13 +62,13 @@ func load(_ *cli.Context) error {
 }
 
 func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig, amtMsat int64) error {
-	senderClient, err := getLndConnection(&senderCfg.Lnd)
+	senderClient, err := getNodeConnection(senderCfg)
 	if err != nil {
 		return err
 	}
 	defer senderClient.Close()
 
-	receiverClient, err := getLndConnection(&receiverCfg.Lnd)
+	receiverClient, err := getNodeConnection(receiverCfg)
 	if err != nil {
 		return err
 	}

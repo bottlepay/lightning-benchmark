@@ -51,5 +51,6 @@ func main() {
 	app.Commands = []cli.Command{loadCommand, setupCommand}
 	if err := app.Run(os.Args); err != nil {
 		log.Errorw("Exiting", "err", err)
+		os.Exit(1)
 	}
 }
