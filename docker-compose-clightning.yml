@@ -1,0 +1,37 @@
+version: '3.4'
+services:
+  bitcoind:
+    image: kylemanna/bitcoind
+    volumes:
+      - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+
+  clightning-alice:
+    image: elementsproject/lightningd
+    depends_on:
+      - bitcoind
+    environment:
+      - EXPOSE_TCP=true
+      - LIGHTNINGD_NETWORK=regtest
+    volumes:
+      - ./c-lightning.conf:/root/.lightning/regtest/config
+    command: --network=regtest
+
+  clightning-bob:
+    image: elementsproject/lightningd
+    depends_on:
+      - bitcoind
+    environment:
+      - EXPOSE_TCP=true
+      - LIGHTNINGD_NETWORK=regtest
+    volumes:
+      - ./c-lightning.conf:/root/.lightning/regtest/config
+    command: --network=regtest
+
+  loadtest:
+     build: loadtest
+     depends_on:
+       - clightning-alice
+       - clightning-bob
+     volumes:
+       - ./loadtest-clightning.yml:/loadtest.yml
+ 

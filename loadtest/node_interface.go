@@ -23,6 +23,9 @@ func getNodeConnection(cfg *clientConfig) (nodeInterface, error) {
 	switch {
 	case cfg.Lnd != nil:
 		return getLndConnection(cfg.Lnd)
+
+	case cfg.Clightning != nil:
+		return getClightningConnection(cfg.Clightning)
 	}
 
 	return nil, errors.New("unrecognized config")

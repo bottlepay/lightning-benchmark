@@ -1,0 +1,16 @@
+bitcoind:
+  host: bitcoind:8332
+  user: test
+  pass: test
+sender:
+  host: clightning-alice:9735
+  clightning:
+    rpcHost: clightning-alice:9835
+receiver:
+  host: clightning-bob:9735
+  clightning:
+    rpcHost: clightning-bob:9835
+paymentAmountMsat: 1000
+processes: 100
+channels: 1
+channelCapacitySat: 10000000

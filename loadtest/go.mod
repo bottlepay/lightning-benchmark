@@ -18,4 +18,7 @@ require (
 	gopkg.in/macaroon-bakery.v2 v2.0.1
 	gopkg.in/macaroon.v2 v2.1.0
 	gopkg.in/yaml.v2 v2.2.3
+	github.com/niftynei/glightning v0.8.2
 )
+
+replace github.com/niftynei/glightning => github.com/joostjager/glightning v0.8.3-0.20210325135629-f1548ac8aeb8

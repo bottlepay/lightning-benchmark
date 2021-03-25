@@ -13,9 +13,14 @@ type lndConfig struct {
 	MacaroonPath string `yaml:"macaroonPath"`
 }
 
+type clightningConfig struct {
+	RpcHost string `yaml:"rpcHost"`
+}
+
 type clientConfig struct {
-	Lnd  *lndConfig `yaml:"lnd"`
-	Host string     `yaml:"host"`
+	Lnd        *lndConfig        `yaml:"lnd"`
+	Clightning *clightningConfig `yaml:"clightning"`
+	Host       string            `yaml:"host"`
 }
 
 type bitcoindConfig struct {
