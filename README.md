@@ -32,3 +32,5 @@ with a single channel.
 In the file `loadtest.yml` the following test parameters can be set:
 * `paymentAmountMsat`: the test amount that is paid
 * `processes`: the number of parallel processes
+* `channels`: the number of channels between the two test nodes
+* `channelCapacitySat`: capacity of the channel(s)
