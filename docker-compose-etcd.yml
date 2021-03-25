@@ -69,7 +69,7 @@ services:
     volumes:
       - lnd-alice:/lnd-alice
       - lnd-bob:/lnd-bob
-      - ./loadtest.yml:/loadtest.yml
+      - ./loadtest-lnd.yml:/loadtest.yml
  
 volumes:
   lnd-alice:

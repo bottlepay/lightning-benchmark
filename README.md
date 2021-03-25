@@ -1,9 +1,9 @@
 # Node benchmark
 
-This repository contains a load test for `lnd`.
+This repository contains a load test for lightning node software.
 
 The test creates a setup with a bitcoind regtest node and two connected
-lightning nodes instances. 
+lightning nodes instances.
 
 A test application spins up 100 goroutines that continously request an invoice
 from one instance and pay it from the other one.
@@ -20,7 +20,7 @@ With etcd database backend: `./run.sh docker-compose-etcd.yml`
 
 The lnd test runs with 10 channels between both nodes.
 
-### C-lightning
+### c-lightning
 
 `./run.sh docker-compose-clightning.yml`
 
