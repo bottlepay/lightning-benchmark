@@ -20,14 +20,38 @@ type lndConnection struct {
 	lightningClient lnrpc.LightningClient
 }
 
+func tryFunc(f func() error, maxAttempts int) error {
+	var attempts int
+	for {
+		err := f()
+		if err == nil {
+			return err
+		}
+
+		attempts++
+		if attempts == maxAttempts {
+			return err
+		}
+
+		time.Sleep(time.Second)
+	}
+}
+
 func getLndConnection(cfg *lndConfig) (*lndConnection, error) {
 	logger := log.With("host", cfg.RpcHost)
-	senderConn, err := getClientConn(cfg)
+
+	var conn *grpc.ClientConn
+	err := tryFunc(
+		func() error {
+			var err error
+			conn, err = getClientConn(cfg)
+			return err
+		}, 10)
 	if err != nil {
 		return nil, err
 	}
 
-	senderClient := lnrpc.NewLightningClient(senderConn)
+	senderClient := lnrpc.NewLightningClient(conn)
 
 	logger.Infow("Attempting to connect to lnd")
 	for {
@@ -47,9 +71,9 @@ func getLndConnection(cfg *lndConfig) (*lndConnection, error) {
 	}
 
 	return &lndConnection{
-		conn:            senderConn,
-		routerClient:    routerrpc.NewRouterClient(senderConn),
-		lightningClient: lnrpc.NewLightningClient(senderConn),
+		conn:            conn,
+		routerClient:    routerrpc.NewRouterClient(conn),
+		lightningClient: lnrpc.NewLightningClient(conn),
 	}, nil
 }
 
