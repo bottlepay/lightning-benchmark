@@ -33,5 +33,4 @@ services:
        - clightning-alice
        - clightning-bob
      volumes:
-       - ./loadtest-clightning.yml:/loadtest.yml
- 
+       - ./${LOADTEST_CONFIG_FILE}:/loadtest.yml

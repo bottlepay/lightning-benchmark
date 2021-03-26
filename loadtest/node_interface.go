@@ -10,6 +10,7 @@ type nodeInterface interface {
 	ActiveChannels() (int, error)
 	AddInvoice(amtMsat int64) (string, error)
 	SendPayment(invoice string) error
+	SendKeysend(destination string, amtMsat int64) error
 	Close()
 	HasFunds() error
 }

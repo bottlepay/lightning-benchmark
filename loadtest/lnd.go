@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
+	"math/rand"
 	"time"
 
 	"github.com/lightningnetwork/lnd/lnrpc"
 	"github.com/lightningnetwork/lnd/lnrpc/routerrpc"
+	"github.com/lightningnetwork/lnd/lntypes"
+	"github.com/lightningnetwork/lnd/record"
 	"google.golang.org/grpc"
 )
 
@@ -124,6 +128,51 @@ func (l *lndConnection) SendPayment(invoice string) error {
 		TimeoutSeconds:    60,
 		NoInflightUpdates: true,
 	})
+	if err != nil {
+		return err
+	}
+
+	update, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+
+	if update.State != routerrpc.PaymentState_SUCCEEDED {
+		return errors.New("payment failed")
+	}
+
+	return nil
+}
+
+func (l *lndConnection) SendKeysend(destination string, amtMsat int64) error {
+	dest, err := hex.DecodeString(destination)
+	if err != nil {
+		return err
+	}
+
+	var preimage lntypes.Preimage
+	if _, err := rand.Read(preimage[:]); err != nil {
+		return err
+	}
+	hash := preimage.Hash()
+
+	var req = routerrpc.SendPaymentRequest{
+		PaymentHash:       hash[:],
+		Dest:              dest,
+		AmtMsat:           amtMsat,
+		TimeoutSeconds:    60,
+		NoInflightUpdates: true,
+		DestCustomRecords: map[uint64][]byte{
+			record.KeySendType: preimage[:],
+		},
+		FinalCltvDelta: 40,
+		DestFeatures:   []lnrpc.FeatureBit{lnrpc.FeatureBit_TLV_ONION_OPT},
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	stream, err := l.routerClient.SendPayment(ctx, &req)
 	if err != nil {
 		return err
 	}

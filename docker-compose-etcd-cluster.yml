@@ -159,8 +159,8 @@ services:
     volumes:
       - lnd-alice:/lnd-alice
       - lnd-bob:/lnd-bob
-      - ./loadtest-lnd.yml:/loadtest.yml
- 
+      - ./${LOADTEST_CONFIG_FILE}:/loadtest.yml
+
 volumes:
   lnd-alice:
   lnd-bob:

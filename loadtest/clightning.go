@@ -118,6 +118,10 @@ func (l *clightningConnection) SendPayment(invoice string) error {
 	return nil
 }
 
+func (l *clightningConnection) SendKeysend(destination string, amtMsat int64) error {
+	return errors.New("not implemented")
+}
+
 func randomString(n int) string {
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 

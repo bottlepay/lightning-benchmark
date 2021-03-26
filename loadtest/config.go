@@ -37,6 +37,7 @@ type config struct {
 	Processes          int
 	Channels           int
 	ChannelCapacitySat int64 `yaml:"channelCapacitySat"`
+	Keysend            bool
 }
 
 func loadConfig() (*config, error) {

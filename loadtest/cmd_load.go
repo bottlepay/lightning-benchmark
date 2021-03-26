@@ -30,7 +30,10 @@ func load(_ *cli.Context) error {
 		go func() {
 			defer wg.Done()
 
-			err := loadThread(&cfg.Sender, &cfg.Receiver, cfg.PaymentAmountMsat)
+			err := loadThread(
+				&cfg.Sender, &cfg.Receiver,
+				cfg.PaymentAmountMsat, cfg.Keysend,
+			)
 			if err != nil {
 				log.Errorw("Send error", "err", err)
 				os.Exit(1)
@@ -61,7 +64,9 @@ func load(_ *cli.Context) error {
 	return nil
 }
 
-func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig, amtMsat int64) error {
+func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig,
+	amtMsat int64, keysend bool) error {
+
 	senderClient, err := getNodeConnection(senderCfg)
 	if err != nil {
 		return err
@@ -74,23 +79,43 @@ func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig, amtMsat int6
 	}
 	defer receiverClient.Close()
 
-	send := func() error {
-		invoice, err := receiverClient.AddInvoice(amtMsat)
+	var send func() error
+	if keysend {
+		receiverInfo, err := receiverClient.GetInfo()
 		if err != nil {
 			return err
 		}
+		receiverKey := receiverInfo.key
 
-		err = senderClient.SendPayment(invoice)
-		if err != nil {
-			log.Errorw("Error sending payment", "err", err)
-			return err
+		send = func() error {
+			err = senderClient.SendKeysend(receiverKey, amtMsat)
+			if err != nil {
+				log.Errorw("Error sending payment", "err", err)
+				return err
+			}
+
+			settledChan <- struct{}{}
+
+			return nil
 		}
+	} else {
+		send = func() error {
+			invoice, err := receiverClient.AddInvoice(amtMsat)
+			if err != nil {
+				return err
+			}
 
-		settledChan <- struct{}{}
+			err = senderClient.SendPayment(invoice)
+			if err != nil {
+				log.Errorw("Error sending payment", "err", err)
+				return err
+			}
 
-		return nil
+			settledChan <- struct{}{}
+
+			return nil
+		}
 	}
-
 	for {
 		err := send()
 		if err != nil {
