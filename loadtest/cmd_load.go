@@ -41,7 +41,7 @@ func load(_ *cli.Context) error {
 		}()
 	}
 
-	const statBlockSize = 100
+	const statBlockSize = 1000
 	go func() {
 		last := time.Now()
 		settledCount := 0
