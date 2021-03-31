@@ -5,7 +5,7 @@ This repository contains a load test for lightning node software.
 The test creates a setup with a bitcoind regtest node and two connected
 lightning nodes instances.
 
-A test application spins up 100 goroutines that continously request an invoice
+A test application spins up 100 workers that continously request an invoice
 from one instance and pay it from the other one.
 
 Output is the number of transaction that are settled per second (TPS).
@@ -16,13 +16,17 @@ Output is the number of transaction that are settled per second (TPS).
 
 The following configurations are available:
 
-Configuration | Description
----|---
-`lnd-bbolt` | `lnd` with a bbolt database backend, 10 channels between the nodes
-`lnd-bbolt-keysend` | `lnd` with a bbolt database backend, 10 channels between the nodes, spontaneous keysend payments
-`lnd-etcd` | `lnd` with a single etcd instance as the database backend, 10 channels between the nodes
-`lnd-etcd-cluster` | `lnd` with a three-instance etcd cluster as the database backend, 10 channels between the nodes
-`clightning` | `c-lightning`, single channel between the nodes (multiple channels not supported)
+Configuration | Implementation | Backend | Channels | Workers | Options
+---|---|---|---|---|--
+`lnd-bbolt` | lnd | bbolt | 10 | 100  |
+`lnd-bbolt-keysend` | lnd | bbolt | 10 | 100 | keysend
+`lnd-etcd` | lnd | single etcd instance | 10 | 100 |
+`lnd-etcd-cluster` | lnd | three-instance etcd cluster | 10 | 100  |
+`clightning` | c-lightning | sqlite | 1 <sup>[1]</sup> | 100 |
+`eclair` | eclair | sqlite | 10 | 10  <sup>[2]</sup>|
+
+<sup>1</sup> Multiple channels are not supported in c-lightning  
+<sup>2</sup> Reduced number of workers to prevent timeouts
 
 ## Profiling
 
