@@ -1,0 +1,18 @@
+bitcoind:
+  host: bitcoind:8332
+  user: test
+  pass: test
+sender:
+  host: eclair-alice:9735
+  eclair:
+    rpcHost: eclair-alice:8081
+    password: test
+receiver:
+  host: eclair-bob:9735
+  eclair:
+    rpcHost: eclair-bob:8081
+    password: test
+paymentAmountMsat: 1000
+processes: 100
+channels: 10
+channelCapacitySat: 10000000

@@ -28,6 +28,8 @@ github.com/btcsuite/btcd v0.20.1-beta/go.mod h1:wVuoA8VJLEcwgqHBwHmzLRazpKxTv13P
 github.com/btcsuite/btcd v0.20.1-beta.0.20200513120220-b470eee47728/go.mod h1:wVuoA8VJLEcwgqHBwHmzLRazpKxTv13Px/pDuV7OomQ=
 github.com/btcsuite/btcd v0.20.1-beta.0.20200730232343-1db1b6f8217f h1:m/GhMTvDQLbID616c4TYdHyt0MZ9lH5B/nf9Lu3okCY=
 github.com/btcsuite/btcd v0.20.1-beta.0.20200730232343-1db1b6f8217f/go.mod h1:ZSWyehm27aAuS9bvkATT+Xte3hjHZ+MRgMY/8NJ7K94=
+github.com/btcsuite/btcd v0.21.0-beta.0.20210316172410-f86ae60936d7 h1:NOnU2sx+tjFC/gao1wGSQhX7danZx+RjiCAMBN1o48I=
+github.com/btcsuite/btcd v0.21.0-beta.0.20210316172410-f86ae60936d7/go.mod h1:Sv4JPQ3/M+teHz9Bo5jBpkNcP0x6r7rdihlNL/7tTAs=
 github.com/btcsuite/btclog v0.0.0-20170628155309-84c8d2346e9f h1:bAs4lUbRJpnnkd9VhRV3jjAVU7DJVjMaK+IsvSeZvFo=
 github.com/btcsuite/btclog v0.0.0-20170628155309-84c8d2346e9f/go.mod h1:TdznJufoqS23FtqVCzL0ZqgP5MqXbb4fg/WgDys70nA=
 github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d/go.mod h1:+5NJ2+qvTyV9exUAL/rxXi3DcLg2Ts+ymUAY5y4NvMg=
@@ -160,9 +162,6 @@ github.com/jessevdk/go-flags v1.4.0 h1:4IU2WS7AumrZ/40jfhf4QVDMsQwqA7VEHozFRrGAR
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
 github.com/jonboulle/clockwork v0.1.0 h1:VKV+ZcuP6l3yW9doeqz6ziZGgcynBVQO+obU0+0hcPo=
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
-github.com/joostjager/glightning v0.8.2 h1:kgnh6ZLk6m1XvbklA0EQQwtkujYyOi9GAYVKt+laOq0=
-github.com/joostjager/glightning v0.8.3-0.20210324162855-47b3bae01bc4 h1:tFU/EIjSaFvvqoYkg+91EK1O0NxTCt3hX3FHeYxs8Fc=
-github.com/joostjager/glightning v0.8.3-0.20210324162855-47b3bae01bc4/go.mod h1:DKmGAg9l1Z6g/MRiUq9XIQ5hzhs6Vgz/jfZapQ2gbIg=
 github.com/joostjager/glightning v0.8.3-0.20210325135629-f1548ac8aeb8 h1:4fwm7jYcYzWzIFHbhRlUlAPUK3XSe+FjNdkUHP+LVZY=
 github.com/joostjager/glightning v0.8.3-0.20210325135629-f1548ac8aeb8/go.mod h1:DKmGAg9l1Z6g/MRiUq9XIQ5hzhs6Vgz/jfZapQ2gbIg=
 github.com/jrick/logrotate v1.0.0 h1:lQ1bL/n9mBNeIXoTUoYRlK4dHuNJVofX9oWqBtPnSzI=
@@ -209,8 +208,6 @@ github.com/lightningnetwork/lnd v0.11.1-beta.rc4 h1:0yMaOgMV/HXP4nVwqkshyqtVCjT6
 github.com/lightningnetwork/lnd v0.11.1-beta.rc4/go.mod h1:PGIgxy8aH70Li33YVYkHSaCM8m8LjEevk5h1Dpldrr4=
 github.com/lightningnetwork/lnd/cert v1.0.2 h1:g2rEu+sM2Uyz0bpfuvwri/ks6R/26H5iY1NcGbpDJ+c=
 github.com/lightningnetwork/lnd/cert v1.0.2/go.mod h1:fmtemlSMf5t4hsQmcprSoOykypAPp+9c+0d0iqTScMo=
-github.com/lightningnetwork/lnd/cert v1.0.3 h1:/K2gjzLgVI8we2IIPKc0ztWTEa85uds5sWXi1K6mOT0=
-github.com/lightningnetwork/lnd/cert v1.0.3/go.mod h1:3MWXVLLPI0Mg0XETm9fT4N9Vyy/8qQLmaM5589bEggM=
 github.com/lightningnetwork/lnd/clock v1.0.1 h1:QQod8+m3KgqHdvVMV+2DRNNZS1GRFir8mHZYA+Z2hFo=
 github.com/lightningnetwork/lnd/clock v1.0.1/go.mod h1:KnQudQ6w0IAMZi1SgvecLZQZ43ra2vpDNj7H/aasemg=
 github.com/lightningnetwork/lnd/queue v1.0.1/go.mod h1:vaQwexir73flPW43Mrm7JOgJHmcEFBWWSl9HlyASoms=
@@ -281,6 +278,7 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.5.1 h1:nOGnQDM7FYENwehXlg/kFVnos3rEvtKTjRvOWSzb6H4=
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
+github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/tidwall/pretty v1.0.0 h1:HsD+QiTn7sK6flMKIvNmpqz1qrpP3Ps6jOKIKMooyg4=
 github.com/tidwall/pretty v1.0.0/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
@@ -417,6 +415,7 @@ gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.3 h1:fvjTMHxHEw/mxHbtzPi3JCcKXQRAnQTBRo6YCJSVHKI=
 gopkg.in/yaml.v2 v2.2.3/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
+gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c h1:dUUwHk2QECo/6vqA44rthZ8ie2QXMNeKRTHCNY2nXvo=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 honnef.co/go/tools v0.0.0-20180728063816-88497007e858/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=

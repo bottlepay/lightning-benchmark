@@ -1,0 +1,27 @@
+version: '3.4'
+services:
+  bitcoind:
+    image: kylemanna/bitcoind
+    volumes:
+      - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+
+  eclair-alice:
+    restart: unless-stopped
+    image: acinq/eclair
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./eclair.conf:/data/eclair.conf
+
+  eclair-bob:
+    restart: unless-stopped
+    image: acinq/eclair
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./eclair.conf:/data/eclair.conf
+
+  loadtest:
+     build: loadtest
+     volumes:
+       - ./${LOADTEST_CONFIG_FILE}:/loadtest.yml

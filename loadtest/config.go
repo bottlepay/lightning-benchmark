@@ -20,13 +20,20 @@ type clightningConfig struct {
 type clientConfig struct {
 	Lnd        *lndConfig        `yaml:"lnd"`
 	Clightning *clightningConfig `yaml:"clightning"`
-	Host       string            `yaml:"host"`
+	Eclair     *eclairConfig     `yaml:"eclair"`
+
+	Host string `yaml:"host"`
 }
 
 type bitcoindConfig struct {
 	Host string
 	User string
 	Pass string
+}
+
+type eclairConfig struct {
+	RpcHost  string `yaml:"rpcHost"`
+	Password string `yaml:"password"`
 }
 
 type config struct {
