@@ -67,16 +67,25 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
+	log.Infow("Creating bitcoind wallet")
+	_, err = bitcoindConn.CreateWallet("")
+	if err != nil {
+		return err
+	}
+
 	log.Infow("Fund sender")
 	senderClient, err := getNodeConnection(&cfg.Sender)
 	if err != nil {
 		return err
 	}
 	defer senderClient.Close()
+
 	addrResp, err := senderClient.NewAddress()
 	if err != nil {
 		return err
 	}
+	log.Infow("Generated funding address", "address", addrResp)
+
 	senderAddr, err := btcutil.DecodeAddress(addrResp, &chaincfg.RegressionNetParams)
 	if err != nil {
 		return err
