@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,7 +10,18 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
+)
+
+var (
+	sentPayments     = make(map[string]struct{})
+	sentPaymentsLock sync.Mutex
+
+	wsServers     = make(map[string]struct{})
+	wsServersLock sync.Mutex
 )
 
 type eclairConnection struct {
@@ -28,18 +40,78 @@ func getEclairConnection(cfg *eclairConfig) (*eclairConnection, error) {
 
 	logger := log.With("host", cfg.RpcHost)
 
+	var key string
 	logger.Infow("Attempting to connect to eclair")
 	for {
 		info, err := conn.GetInfo()
 		if err == nil {
-			logger.Infow("Connected to eclair", "key", info.key)
+			key = info.key
+			logger.Infow("Connected to eclair", "key", key)
 			break
 		}
 
 		time.Sleep(time.Second)
 	}
 
+	wsServersLock.Lock()
+	_, running := wsServers[key]
+	defer wsServersLock.Unlock()
+
+	if !running {
+		go func() {
+			err := conn.eventListener(cfg)
+			if err != nil {
+				log.Errorw("event listener", "err", err)
+			}
+		}()
+
+		wsServers[key] = struct{}{}
+	}
+
 	return conn, nil
+}
+
+func (l *eclairConnection) eventListener(cfg *eclairConfig) error {
+	u := url.URL{
+		Scheme: "ws",
+		Host:   cfg.RpcHost,
+		Path:   "/ws",
+	}
+	headers := make(http.Header)
+
+	auth := ":" + cfg.Password
+	auth64 := base64.StdEncoding.EncodeToString([]byte(auth))
+	headers.Set("Authorization", "Basic "+auth64)
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), headers)
+	if err != nil {
+		return err
+	}
+
+	for {
+		var msg struct {
+			Type string
+			Id   string
+		}
+
+		// receive message
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			return err
+		}
+
+		err = json.Unmarshal(message, &msg)
+		if err != nil {
+			return err
+		}
+
+		if msg.Type != "payment-sent" {
+			continue
+		}
+
+		sentPaymentsLock.Lock()
+		sentPayments[msg.Id] = struct{}{}
+		sentPaymentsLock.Unlock()
+	}
 }
 
 func (l *eclairConnection) Close() {
@@ -225,33 +297,15 @@ func (l *eclairConnection) SendPayment(invoice string) error {
 
 func (l *eclairConnection) waitForSent(id string) error {
 	for {
-		respBytes, err := l.call("getsentinfo", map[string]string{
-			"id": id,
-		})
-		if err != nil {
-			return err
+		sentPaymentsLock.Lock()
+		_, sent := sentPayments[id]
+		sentPaymentsLock.Unlock()
+
+		if sent {
+			return nil
 		}
 
-		var resp []struct {
-			Status struct {
-				Type string
-			}
-		}
-		err = json.Unmarshal(respBytes, &resp)
-		if err != nil {
-			log.Errorw("json deserialize error",
-				"err", err, "data", string(respBytes))
-
-			return err
-		}
-
-		for _, attempt := range resp {
-			if attempt.Status.Type == "sent" {
-				return nil
-			}
-		}
-
-		time.Sleep(time.Second)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
