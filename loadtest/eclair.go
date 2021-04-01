@@ -163,14 +163,15 @@ func (l *eclairConnection) ActiveChannels() (int, error) {
 }
 
 func (l *eclairConnection) AddInvoice(amtMsat int64) (string, error) {
-	invoice, err := l.addInvoice(amtMsat)
-	if err != nil {
-		// Sometimes eclair returns an empty invoice. Give it one more
-		// chance.
-		invoice, err = l.addInvoice(amtMsat)
-	}
+	for {
+		invoice, err := l.addInvoice(amtMsat)
+		if err == nil {
+			return invoice, nil
+		}
 
-	return invoice, err
+		log.Warnw("Invoice generation failed", "err", err)
+		time.Sleep(time.Second)
+	}
 }
 
 func (l *eclairConnection) addInvoice(amtMsat int64) (string, error) {

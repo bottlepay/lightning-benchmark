@@ -13,6 +13,6 @@ receiver:
     rpcHost: eclair-bob:8081
     password: test
 paymentAmountMsat: 1000
-processes: 100
+processes: 10
 channels: 10
 channelCapacitySat: 10000000
