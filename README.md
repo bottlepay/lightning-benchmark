@@ -41,9 +41,9 @@ Below are the test results after 10,000 payments on the following machine:
 |`clightning`| 61  |
 |`lnd-bbolt-keysend`| 35  |
 |`lnd-bbolt`| 33  |
+|`eclair`| 12 |
 |`lnd-etcd`| 4 |
 |`lnd-etcd-cluster`| 4 |
-|`eclair`| 1 |
 
 ## Profiling
 
