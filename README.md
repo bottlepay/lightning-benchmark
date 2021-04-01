@@ -28,6 +28,23 @@ Configuration | Implementation | Backend | Channels | Workers | Options
 <sup>1</sup> Multiple channels are not supported in c-lightning  
 <sup>2</sup> Reduced number of workers to prevent timeouts
 
+## Results
+
+Below are the test results after 10,000 payments on the following machine:
+
+* Google Cloud `n2d-standard-8` instance (8 vCPUs, 32 GB memory)
+* 100 GB zonal pd-ssd with ext4 filesystem
+* Ubuntu 20.04 LTS
+
+| Configuration | Transactions per second |
+|--|--|
+|`clightning`| 61  |
+|`lnd-bbolt-keysend`| 35  |
+|`lnd-bbolt`| 33  |
+|`lnd-etcd`| 4 |
+|`lnd-etcd-cluster`| 4 |
+|`eclair`| 1 |
+
 ## Profiling
 
 For `lnd` nodes, a cpu profile can be extracted for further analysis. The sender node profiler is reachable through port 5000 on the host. The receiver node profiler is available at port 5001.
