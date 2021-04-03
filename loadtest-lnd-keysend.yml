@@ -2,18 +2,31 @@ bitcoind:
   host: bitcoind:8332
   user: test
   pass: test
-sender:
-  host: lnd-alice:9735
-  lnd:
-    tlsCertPath: /lnd-alice/tls.cert
-    rpcHost: lnd-alice:10009
-    macaroonPath: /lnd-alice/admin.macaroon
-receiver:
-  host: lnd-bob:9735
-  lnd:
-    tlsCertPath: /lnd-bob/tls.cert
-    rpcHost: lnd-bob:10009
-    macaroonPath: /lnd-bob/admin.macaroon
+nodes:
+  - sender:
+      host: lnd-alice-1:9735
+      lnd:
+        tlsCertPath: /lnd-alice-1/tls.cert
+        rpcHost: lnd-alice-1:10009
+        macaroonPath: /lnd-alice-1/admin.macaroon
+    receiver:
+      host: lnd-bob-1:9735
+      lnd:
+        tlsCertPath: /lnd-bob-1/tls.cert
+        rpcHost: lnd-bob-1:10009
+        macaroonPath: /lnd-bob-1/admin.macaroon
+  - sender:
+      host: lnd-alice-2:9735
+      lnd:
+        tlsCertPath: /lnd-alice-2/tls.cert
+        rpcHost: lnd-alice-2:10009
+        macaroonPath: /lnd-alice-2/admin.macaroon
+    receiver:
+      host: lnd-bob-2:9735
+      lnd:
+        tlsCertPath: /lnd-bob-2/tls.cert
+        rpcHost: lnd-bob-2:10009
+        macaroonPath: /lnd-bob-2/admin.macaroon
 paymentAmountMsat: 1000
 processes: 100
 channels: 10

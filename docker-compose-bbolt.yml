@@ -5,41 +5,57 @@ services:
     volumes:
       - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
 
-  lnd-alice:
+  lnd-alice-1:
     restart: unless-stopped
     image: lightninglabs/lnd:v0.12.1-beta
     depends_on:
       - bitcoind
     volumes:
       - ./lnd.conf:/root/.lnd/lnd.conf
-      - lnd-alice:/cfg
-    ports:
-      - 5000:5000
-    command: --tlsextradomain=lnd-alice
+      - lnd-alice-1:/cfg
+    command: --tlsextradomain=lnd-alice-1
 
-  lnd-bob:
+  lnd-bob-1:
     restart: unless-stopped
     image: lightninglabs/lnd:v0.12.1-beta
     depends_on:
       - bitcoind
-    ports:
-      - 5001:5000
     volumes:
       - ./lnd.conf:/root/.lnd/lnd.conf
-      - lnd-bob:/cfg
-    command: --tlsextradomain=lnd-bob
+      - lnd-bob-1:/cfg
+    command: --tlsextradomain=lnd-bob-1
+
+  lnd-alice-2:
+    restart: unless-stopped
+    image: lightninglabs/lnd:v0.12.1-beta
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-alice-2:/cfg
+    command: --tlsextradomain=lnd-alice-2
+
+  lnd-bob-2:
+    restart: unless-stopped
+    image: lightninglabs/lnd:v0.12.1-beta
+    depends_on:
+      - bitcoind
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-bob-2:/cfg
+    command: --tlsextradomain=lnd-bob-2
 
   loadtest:
     build: loadtest
-    depends_on:
-      - lnd-alice
-      - lnd-bob
     volumes:
-      - lnd-alice:/lnd-alice
-      - lnd-bob:/lnd-bob
+      - lnd-alice-1:/lnd-alice-1
+      - lnd-bob-1:/lnd-bob-1
+      - lnd-alice-2:/lnd-alice-2
+      - lnd-bob-2:/lnd-bob-2
       - ./${LOADTEST_CONFIG_FILE}:/loadtest.yml
 
 volumes:
-  lnd-alice:
-  lnd-bob:
-    
+  lnd-alice-1:
+  lnd-bob-1:
+  lnd-alice-2:
+  lnd-bob-2:

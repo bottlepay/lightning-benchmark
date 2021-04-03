@@ -1,4 +1,4 @@
-module github.com/bottlepay/loadtest
+module github.com/bottlepay/lightning-benchmark/loadtest
 
 go 1.13
 
@@ -6,7 +6,7 @@ require (
 	github.com/btcsuite/btcd v0.21.0-beta.0.20210316172410-f86ae60936d7
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/gorilla/websocket v1.4.2
-	github.com/lightningnetwork/lnd v0.11.1-beta.rc4
+	github.com/lightningnetwork/lnd v0.12.1-beta
 	github.com/niftynei/glightning v0.8.2
 	github.com/urfave/cli v1.22.4
 	go.uber.org/zap v1.14.1

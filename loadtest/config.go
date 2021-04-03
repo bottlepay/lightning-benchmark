@@ -36,9 +36,13 @@ type eclairConfig struct {
 	Password string `yaml:"password"`
 }
 
+type nodes struct {
+	Sender   clientConfig `yaml:"sender"`
+	Receiver clientConfig `yaml:"receiver"`
+}
+
 type config struct {
-	Sender             clientConfig   `yaml:"sender"`
-	Receiver           clientConfig   `yaml:"receiver"`
+	Nodes              []nodes
 	Bitcoind           bitcoindConfig `yaml:"bitcoind"`
 	PaymentAmountMsat  int64          `yaml:"paymentAmountMsat"`
 	Processes          int

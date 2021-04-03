@@ -26,19 +26,23 @@ func load(_ *cli.Context) error {
 
 	var wg sync.WaitGroup
 	for t := 0; t < cfg.Processes; t++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+		for _, nodes := range cfg.Nodes {
+			nodes := nodes
 
-			err := loadThread(
-				&cfg.Sender, &cfg.Receiver,
-				cfg.PaymentAmountMsat, cfg.Keysend,
-			)
-			if err != nil {
-				log.Errorw("Send error", "err", err)
-				os.Exit(1)
-			}
-		}()
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+
+				err := loadThread(
+					&nodes.Sender, &nodes.Receiver,
+					cfg.PaymentAmountMsat, cfg.Keysend,
+				)
+				if err != nil {
+					log.Errorw("Send error", "err", err)
+					os.Exit(1)
+				}
+			}()
+		}
 	}
 
 	const statBlockSize = 1000
