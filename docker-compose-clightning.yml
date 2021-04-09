@@ -6,7 +6,7 @@ services:
       - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
 
   clightning-alice:
-    image: elementsproject/lightningd
+    image: elementsproject/lightningd:v0.9.3
     depends_on:
       - bitcoind
     environment:
@@ -17,7 +17,7 @@ services:
     command: --network=regtest
 
   clightning-bob:
-    image: elementsproject/lightningd
+    image: elementsproject/lightningd:v0.9.3
     depends_on:
       - bitcoind
     environment:

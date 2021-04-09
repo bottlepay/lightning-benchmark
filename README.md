@@ -8,7 +8,8 @@ lightning nodes instances.
 A test application spins up 100 workers that continously request an invoice
 from one instance and pay it from the other one.
 
-Output is the number of transaction that are settled per second (TPS).
+Output is the number of transaction that are settled per second (TPS) and the
+average payment latency.
 
 ## How to run
 
@@ -18,12 +19,12 @@ The following configurations are available:
 
 Configuration | Implementation | Backend | Channels | Workers | Options
 ---|---|---|---|---|--
-`lnd-bbolt` | lnd | bbolt | 10 | 100  |
-`lnd-bbolt-keysend` | lnd | bbolt | 10 | 100 | keysend
-`lnd-etcd` | lnd | single etcd instance | 10 | 100 |
-`lnd-etcd-cluster` | lnd | three-instance etcd cluster | 10 | 100  |
-`clightning` | c-lightning | sqlite | 1 <sup>[1]</sup> | 100 |
-`eclair` | eclair | sqlite | 10 | 10  <sup>[2]</sup>|
+`lnd-bbolt` | lnd 0.12.1 | bbolt | 10 | 100  |
+`lnd-bbolt-keysend` | lnd 0.12.1  | bbolt | 10 | 100 | keysend
+`lnd-etcd` | lnd 0.12.1  | single etcd instance | 10 | 100 |
+`lnd-etcd-cluster` | lnd 0.12.1  | three-instance etcd cluster | 10 | 100  |
+`clightning` | c-lightning 0.9.3 | sqlite | 1 <sup>[1]</sup> | 100 |
+`eclair` | eclair 0.5.1 | sqlite | 10 | 10  <sup>[2]</sup>|
 
 <sup>1</sup> Multiple channels are not supported in c-lightning  
 <sup>2</sup> Reduced number of workers to prevent timeouts
@@ -36,14 +37,14 @@ Below are the test results after 10,000 payments on the following machine:
 * 100 GB zonal pd-ssd with ext4 filesystem
 * Ubuntu 20.04 LTS
 
-| Configuration | Transactions per second |
-|--|--|
-|`clightning`| 61  |
-|`lnd-bbolt-keysend`| 35  |
-|`lnd-bbolt`| 33  |
-|`eclair`| 12 |
-|`lnd-etcd`| 4 |
-|`lnd-etcd-cluster`| 4 |
+| Configuration | Transactions / sec | Avg latency (sec) |
+|--|--|--|
+|`clightning`| 61 | 1.6  |
+|`lnd-bbolt-keysend`| 35 | 2.8 |
+|`lnd-bbolt`| 33 | 3.0 |
+|`eclair`| 12 | 0.8 |
+|`lnd-etcd`| 4 | 29.2 |
+|`lnd-etcd-cluster`| 4 | 31.8 |
 
 ## Profiling
 
