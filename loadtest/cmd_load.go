@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var settledChan = make(chan struct{})
+var settledChan = make(chan time.Duration)
 
 var loadCommand = cli.Command{
 	Name:   "load",
@@ -43,19 +43,24 @@ func load(_ *cli.Context) error {
 
 	const statBlockSize = 1000
 	go func() {
-		last := time.Now()
 		settledCount := 0
 		for {
-			<-settledChan
-			settledCount++
-
-			if settledCount%statBlockSize == 0 {
-				now := time.Now()
-				tps := float64(statBlockSize) / now.Sub(last).Seconds()
-				log.Infow("Speed", "tps", tps, "count", settledCount)
-
-				last = now
+			last := time.Now()
+			var totalTime time.Duration
+			for i := 0; i < statBlockSize; i++ {
+				totalTime += <-settledChan
+				settledCount++
 			}
+
+			now := time.Now()
+			tps := float64(statBlockSize) / now.Sub(last).Seconds()
+			latency := totalTime.Seconds() / statBlockSize
+			log.Infow("Speed",
+				"tps", tps,
+				"count", settledCount,
+				"avg_latency_sec", latency)
+
+			last = now
 		}
 	}()
 
@@ -88,15 +93,7 @@ func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig,
 		receiverKey := receiverInfo.key
 
 		send = func() error {
-			err = senderClient.SendKeysend(receiverKey, amtMsat)
-			if err != nil {
-				log.Errorw("Error sending payment", "err", err)
-				return err
-			}
-
-			settledChan <- struct{}{}
-
-			return nil
+			return senderClient.SendKeysend(receiverKey, amtMsat)
 		}
 	} else {
 		send = func() error {
@@ -105,21 +102,17 @@ func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig,
 				return err
 			}
 
-			err = senderClient.SendPayment(invoice)
-			if err != nil {
-				log.Errorw("Error sending payment", "err", err)
-				return err
-			}
-
-			settledChan <- struct{}{}
-
-			return nil
+			return senderClient.SendPayment(invoice)
 		}
 	}
 	for {
+		start := time.Now()
 		err := send()
 		if err != nil {
+			log.Errorw("Error sending payment", "err", err)
 			return err
 		}
+
+		settledChan <- time.Since(start)
 	}
 }
