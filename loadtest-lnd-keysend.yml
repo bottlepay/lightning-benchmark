@@ -15,8 +15,8 @@ receiver:
     rpcHost: lnd-bob:10009
     macaroonPath: /lnd-bob/admin.macaroon
 paymentAmountMsat: 1000
-connections: 10
-processesPerConnection: 10
+connections: 161
+processesPerConnection: 60
 channels: 10
 channelCapacitySat: 10000000
 keysend: true

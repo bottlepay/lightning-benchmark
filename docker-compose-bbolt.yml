@@ -7,7 +7,11 @@ services:
 
   lnd-alice:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    build: 
+      context: lnd
+      args:
+        checkout: 015b1e3094fe9e664928736b5bd6643db496d988
+        repo: https://github.com/bottlepay/lnd
     depends_on:
       - bitcoind
     volumes:
@@ -19,7 +23,11 @@ services:
 
   lnd-bob:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    build: 
+      context: lnd
+      args:
+        checkout: 015b1e3094fe9e664928736b5bd6643db496d988
+        repo: https://github.com/bottlepay/lnd
     depends_on:
       - bitcoind
     ports:

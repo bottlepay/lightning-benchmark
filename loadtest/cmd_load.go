@@ -43,7 +43,7 @@ func load(_ *cli.Context) error {
 		}()
 	}
 
-	const statBlockSize = 1000
+	const statBlockSize = 10000
 	go func() {
 		settledCount := 0
 		for {
