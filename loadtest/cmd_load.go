@@ -22,10 +22,11 @@ func load(_ *cli.Context) error {
 	}
 
 	log.Infow("Starting payment processes",
-		"process_count", cfg.Processes, "amt_msat", cfg.PaymentAmountMsat)
+		"connections", cfg.Connections, "processes_per_connection",
+		cfg.ProcessesPerConnection, "amt_msat", cfg.PaymentAmountMsat)
 
 	var wg sync.WaitGroup
-	for t := 0; t < cfg.Processes; t++ {
+	for t := 0; t < cfg.Connections; t++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -33,6 +34,7 @@ func load(_ *cli.Context) error {
 			err := loadThread(
 				&cfg.Sender, &cfg.Receiver,
 				cfg.PaymentAmountMsat, cfg.Keysend,
+				cfg.ProcessesPerConnection,
 			)
 			if err != nil {
 				log.Errorw("Send error", "err", err)
@@ -70,7 +72,7 @@ func load(_ *cli.Context) error {
 }
 
 func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig,
-	amtMsat int64, keysend bool) error {
+	amtMsat int64, keysend bool, processes int) error {
 
 	senderClient, err := getNodeConnection(senderCfg)
 	if err != nil {
@@ -105,14 +107,24 @@ func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig,
 			return senderClient.SendPayment(invoice)
 		}
 	}
-	for {
-		start := time.Now()
-		err := send()
-		if err != nil {
-			log.Errorw("Error sending payment", "err", err)
-			return err
-		}
 
-		settledChan <- time.Since(start)
+	var wg sync.WaitGroup
+	for i := 0; i < processes; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Wait()
+			for {
+				start := time.Now()
+				err := send()
+				if err != nil {
+					log.Errorw("Error sending payment", "err", err)
+					os.Exit(1)
+				}
+
+				settledChan <- time.Since(start)
+			}
+		}()
 	}
+	wg.Wait()
+	return nil
 }

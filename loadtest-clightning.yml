@@ -11,6 +11,7 @@ receiver:
   clightning:
     rpcHost: clightning-bob:9835
 paymentAmountMsat: 1000
-processes: 100
+connections: 10
+processesPerConnection: 10
 channels: 1
 channelCapacitySat: 10000000

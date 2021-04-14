@@ -37,14 +37,15 @@ type eclairConfig struct {
 }
 
 type config struct {
-	Sender             clientConfig   `yaml:"sender"`
-	Receiver           clientConfig   `yaml:"receiver"`
-	Bitcoind           bitcoindConfig `yaml:"bitcoind"`
-	PaymentAmountMsat  int64          `yaml:"paymentAmountMsat"`
-	Processes          int
-	Channels           int
-	ChannelCapacitySat int64 `yaml:"channelCapacitySat"`
-	Keysend            bool
+	Sender                 clientConfig   `yaml:"sender"`
+	Receiver               clientConfig   `yaml:"receiver"`
+	Bitcoind               bitcoindConfig `yaml:"bitcoind"`
+	PaymentAmountMsat      int64          `yaml:"paymentAmountMsat"`
+	Connections            int
+	ProcessesPerConnection int `yaml:"processesPerConnection"`
+	Channels               int
+	ChannelCapacitySat     int64 `yaml:"channelCapacitySat"`
+	Keysend                bool
 }
 
 func loadConfig() (*config, error) {
@@ -59,8 +60,12 @@ func loadConfig() (*config, error) {
 		return nil, err
 	}
 
-	if cfg.Processes == 0 {
-		return nil, errors.New("processes must be set")
+	if cfg.Connections == 0 {
+		return nil, errors.New("connections must be set")
+	}
+
+	if cfg.ProcessesPerConnection == 0 {
+		return nil, errors.New("processes per connection must be set")
 	}
 
 	if cfg.PaymentAmountMsat == 0 {
