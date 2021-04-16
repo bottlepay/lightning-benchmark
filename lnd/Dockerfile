@@ -15,13 +15,15 @@ ENV GODEBUG netdns=cgo
 # will use the Git tip of master by default.
 ARG checkout="master"
 ARG tags="signrpc walletrpc chainrpc invoicesrpc monitoring"
+ARG repo="https://github.com/lightningnetwork/lnd"
 
 # Install dependencies and build the binaries.
 RUN apk add --no-cache --update alpine-sdk \
     git \
     make \
-    gcc \
-&&  git clone https://github.com/lightningnetwork/lnd /go/src/github.com/lightningnetwork/lnd \
+    gcc
+
+RUN git clone $repo /go/src/github.com/lightningnetwork/lnd \
 &&  cd /go/src/github.com/lightningnetwork/lnd \
 &&  git checkout $checkout \
 &&  make release-install tags="$tags"
