@@ -193,7 +193,7 @@ func (l *lndConnection) SendKeysend(destination string, amtMsat int64) error {
 		DestFeatures:   []lnrpc.FeatureBit{lnrpc.FeatureBit_TLV_ONION_OPT},
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 
 	stream, err := l.routerClient.SendPayment(ctx, &req)
