@@ -1,0 +1,81 @@
+version: '3.4'
+services:
+  bitcoind:
+    image: kylemanna/bitcoind
+    volumes:
+      - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
+
+  pg-alice:
+    image: postgres:13.3 
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+
+    environment:
+      POSTGRES_USER: lnd
+      POSTGRES_PASSWORD: lnd
+      POSTGRES_DB: lnd
+
+  pg-bob:
+    image: postgres:13.3
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+
+    environment:
+      POSTGRES_USER: lnd
+      POSTGRES_PASSWORD: lnd
+      POSTGRES_DB: lnd
+
+  lnd-alice:
+    restart: unless-stopped
+    build: 
+      context: lnd
+      args:
+        repo: https://github.com/bottlepay/lnd
+        checkout: fd6bc64238eaa653209b7202f752db85bc434eeb
+        tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_postgres
+    depends_on:
+      - bitcoind
+      - pg-alice
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-alice:/cfg
+    ports:
+      - 5000:5000      
+    command: --tlsextradomain=lnd-alice --db.backend=postgres --db.postgres.dsn=postgres://lnd:lnd@pg-alice:5432/lnd?sslmode=disable --protocol.no-anchors
+
+  lnd-bob:
+    restart: unless-stopped
+    build: 
+      context: lnd
+      args:
+        repo: https://github.com/bottlepay/lnd
+        checkout: fd6bc64238eaa653209b7202f752db85bc434eeb
+        tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_postgres
+    depends_on:
+      - bitcoind
+      - pg-bob
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-bob:/cfg
+    ports:
+      - 5001:5000      
+    command: --tlsextradomain=lnd-bob --db.backend=postgres --db.postgres.dsn=postgres://lnd:lnd@pg-bob:5432/lnd?sslmode=disable --protocol.no-anchors
+
+  loadtest:
+    build: loadtest
+    depends_on:
+      - lnd-alice
+      - lnd-bob
+    volumes:
+      - lnd-alice:/lnd-alice
+      - lnd-bob:/lnd-bob
+      - ./${LOADTEST_CONFIG_FILE}:/loadtest.yml
+ 
+volumes:
+  lnd-alice:
+  lnd-bob:
+    
