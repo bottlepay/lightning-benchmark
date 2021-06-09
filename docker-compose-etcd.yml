@@ -7,7 +7,7 @@ services:
 
   etcd-alice:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.4.16'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
@@ -18,7 +18,7 @@ services:
 
   etcd-bob:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.4.16'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
@@ -32,7 +32,7 @@ services:
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        checkout: v0.13.0-beta.rc5
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -49,7 +49,7 @@ services:
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        checkout: v0.13.0-beta.rc5
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -74,4 +74,4 @@ services:
 volumes:
   lnd-alice:
   lnd-bob:
-    
+
