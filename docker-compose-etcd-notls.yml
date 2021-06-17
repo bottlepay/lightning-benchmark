@@ -30,7 +30,8 @@ services:
     build: 
       context: lnd
       args:
-        checkout: v0.13.0-beta.rc5
+        repo: https://github.com/bhandras/lnd
+        checkout: 12e2fc025d8d100df9238fa7dd2a0ced32ecbddc
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -47,7 +48,8 @@ services:
     build: 
       context: lnd
       args:
-        checkout: v0.13.0-beta.rc5
+        repo: https://github.com/bhandras/lnd
+        checkout: 12e2fc025d8d100df9238fa7dd2a0ced32ecbddc
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
