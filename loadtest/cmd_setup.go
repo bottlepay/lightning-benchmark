@@ -73,44 +73,67 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
-	log.Infow("Fund sender")
+	log.Infow("Fund sender and receiver")
 	senderClient, err := getNodeConnection(&cfg.Sender)
 	if err != nil {
 		return err
 	}
 	defer senderClient.Close()
 
-	addrResp, err := senderClient.NewAddress()
-	if err != nil {
-		return err
-	}
-	log.Infow("Generated funding address", "address", addrResp)
-
-	senderAddr, err := btcutil.DecodeAddress(addrResp, &chaincfg.RegressionNetParams)
-	if err != nil {
-		return err
-	}
-	_, err = bitcoindConn.GenerateToAddress(1, senderAddr, nil)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("Mature coin")
-	_, err = bitcoindConn.GenerateToAddress(105, addr, nil)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("Wait for coin to appear in wallet")
-	if err := senderClient.HasFunds(); err != nil {
-		return err
-	}
-
 	receiverClient, err := getNodeConnection(&cfg.Receiver)
 	if err != nil {
 		return err
 	}
 	defer receiverClient.Close()
+
+	addrSenderResp, err := senderClient.NewAddress()
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Generated funding address for sender", "address", addrSenderResp)
+
+	addrReceiverResp, err := receiverClient.NewAddress()
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Generated funding address for receiver", "address", addrReceiverResp)
+
+	senderAddr, err := btcutil.DecodeAddress(addrSenderResp, &chaincfg.RegressionNetParams)
+	if err != nil {
+		return err
+	}
+
+	receiverAddr, err := btcutil.DecodeAddress(addrReceiverResp, &chaincfg.RegressionNetParams)
+	if err != nil {
+		return err
+	}
+
+	_, err = bitcoindConn.GenerateToAddress(1, senderAddr, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = bitcoindConn.GenerateToAddress(1, receiverAddr, nil)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Mature coins")
+	_, err = bitcoindConn.GenerateToAddress(105, addr, nil)
+	if err != nil {
+		return err
+	}
+
+	log.Infow("Wait for coin to appear in wallets")
+	if err := senderClient.HasFunds(); err != nil {
+		return err
+	}
+
+	if err := receiverClient.HasFunds(); err != nil {
+		return err
+	}
 
 	infoResp, err := receiverClient.GetInfo()
 	if err != nil {

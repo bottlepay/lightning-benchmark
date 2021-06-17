@@ -2,7 +2,7 @@
 
 if [[ $1 == "" ]]
 then
-  echo "usage: run.sh lnd-bbolt | lnd-bbolt-keysend | lnd-etcd | lnd-etcd-cluster | clightning | eclair"
+  echo "usage: run.sh lnd-bbolt | lnd-bbolt-keysend | lnd-etcd | lnd-etcd-notls | lnd-etcd-notls-keysend | lnd-etcd-cluster | clightning | eclair"
   exit 0
 fi
 
@@ -20,6 +20,16 @@ case $1 in
   "lnd-etcd")
     DOCKER_COMPOSE_FILE=docker-compose-etcd.yml
     export LOADTEST_CONFIG_FILE=loadtest-lnd.yml
+    ;;
+  
+  "lnd-etcd-notls")
+    DOCKER_COMPOSE_FILE=docker-compose-etcd-notls.yml
+    export LOADTEST_CONFIG_FILE=loadtest-lnd.yml
+    ;;
+  
+  "lnd-etcd-notls-keysend")
+    DOCKER_COMPOSE_FILE=docker-compose-etcd-notls.yml
+    export LOADTEST_CONFIG_FILE=loadtest-lnd-keysend.yml
     ;;
 
   "lnd-etcd-cluster")

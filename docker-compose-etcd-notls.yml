@@ -10,22 +10,20 @@ services:
     image: 'bitnami/etcd:3.4.16'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
 
   etcd-bob:
     restart: unless-stopped
     image: 'bitnami/etcd:3.4.16'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
 
   lnd-alice:
     restart: unless-stopped
@@ -42,7 +40,7 @@ services:
       - lnd-alice:/cfg
     ports:
       - 5000:5000      
-    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.disabletls
 
   lnd-bob:
     restart: unless-stopped
@@ -59,7 +57,7 @@ services:
       - lnd-bob:/cfg
     ports:
       - 5001:5000      
-    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.disabletls
 
   loadtest:
     build: loadtest
@@ -74,4 +72,4 @@ services:
 volumes:
   lnd-alice:
   lnd-bob:
-
+    
