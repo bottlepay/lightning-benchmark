@@ -7,7 +7,7 @@ services:
 
   lnd-alice:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    image: lightninglabs/lnd:v0.13.0-beta
     depends_on:
       - bitcoind
     volumes:
@@ -15,11 +15,11 @@ services:
       - lnd-alice:/cfg
     ports:
       - 5000:5000
-    command: --tlsextradomain=lnd-alice
+    command: --tlsextradomain=lnd-alice --protocol.no-anchors
 
   lnd-bob:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    image: lightninglabs/lnd:v0.13.0-beta
     depends_on:
       - bitcoind
     ports:
@@ -27,7 +27,7 @@ services:
     volumes:
       - ./lnd.conf:/root/.lnd/lnd.conf
       - lnd-bob:/cfg
-    command: --tlsextradomain=lnd-bob
+    command: --tlsextradomain=lnd-bob --protocol.no-anchors
 
   loadtest:
     build: loadtest
