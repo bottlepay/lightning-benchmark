@@ -32,7 +32,7 @@ services:
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        checkout: v0.13.0-beta
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -42,14 +42,14 @@ services:
       - lnd-alice:/cfg
     ports:
       - 5000:5000      
-    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.insecure_skip_verify --protocol.no-anchors
 
   lnd-bob:
     restart: unless-stopped
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        checkout: v0.13.0-beta
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -59,7 +59,7 @@ services:
       - lnd-bob:/cfg
     ports:
       - 5001:5000      
-    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.insecure_skip_verify --protocol.no-anchors
 
   loadtest:
     build: loadtest
