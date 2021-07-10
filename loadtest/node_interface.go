@@ -3,7 +3,7 @@ package main
 import "errors"
 
 type nodeInterface interface {
-	GetInfo() (*info, error)
+	Key() string
 	Connect(key, host string) error
 	NewAddress() (string, error)
 	OpenChannel(peerKey string, amtSat int64) error

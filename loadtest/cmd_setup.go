@@ -112,11 +112,7 @@ func setup(_ *cli.Context) error {
 	}
 	defer receiverClient.Close()
 
-	infoResp, err := receiverClient.GetInfo()
-	if err != nil {
-		return err
-	}
-	receiverKey := infoResp.key
+	receiverKey := receiverClient.Key()
 	log.Infow("Receiver info", "pubkey", receiverKey)
 
 	log.Infow("Connecting peers")

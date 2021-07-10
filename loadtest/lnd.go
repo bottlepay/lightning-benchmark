@@ -18,6 +18,8 @@ type lndConnection struct {
 	conn            *grpc.ClientConn
 	routerClient    routerrpc.RouterClient
 	lightningClient lnrpc.LightningClient
+
+	key string
 }
 
 func tryFunc(f func() error, maxAttempts int) error {
@@ -54,6 +56,7 @@ func getLndConnection(cfg *lndConfig) (*lndConnection, error) {
 	senderClient := lnrpc.NewLightningClient(conn)
 
 	logger.Infow("Attempting to connect to lnd")
+	var key string
 	for {
 		resp, err := senderClient.GetInfo(context.Background(), &lnrpc.GetInfoRequest{})
 		if err == nil {
@@ -62,6 +65,8 @@ func getLndConnection(cfg *lndConfig) (*lndConnection, error) {
 
 				continue
 			}
+
+			key = resp.IdentityPubkey
 
 			logger.Infow("Connected to lnd", "key", resp.IdentityPubkey)
 			break
@@ -74,6 +79,7 @@ func getLndConnection(cfg *lndConfig) (*lndConnection, error) {
 		conn:            conn,
 		routerClient:    routerrpc.NewRouterClient(conn),
 		lightningClient: lnrpc.NewLightningClient(conn),
+		key:             key,
 	}, nil
 }
 
@@ -81,16 +87,8 @@ func (l *lndConnection) Close() {
 	l.conn.Close()
 }
 
-func (l *lndConnection) GetInfo() (*info, error) {
-	infoResp, err := l.lightningClient.GetInfo(context.Background(), &lnrpc.GetInfoRequest{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &info{
-		key:    infoResp.IdentityPubkey,
-		synced: infoResp.SyncedToChain,
-	}, nil
+func (l *lndConnection) Key() string {
+	return l.key
 }
 
 func (l *lndConnection) Connect(key, host string) error {

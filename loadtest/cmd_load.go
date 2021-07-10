@@ -86,11 +86,7 @@ func loadThread(senderCfg *clientConfig, receiverCfg *clientConfig,
 
 	var send func() error
 	if keysend {
-		receiverInfo, err := receiverClient.GetInfo()
-		if err != nil {
-			return err
-		}
-		receiverKey := receiverInfo.key
+		receiverKey := receiverClient.Key()
 
 		send = func() error {
 			return senderClient.SendKeysend(receiverKey, amtMsat)

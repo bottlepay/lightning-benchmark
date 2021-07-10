@@ -12,6 +12,8 @@ import (
 
 type clightningConnection struct {
 	client *glightning.Lightning
+
+	key string
 }
 
 func getClightningConnection(cfg *clightningConfig) (*clightningConnection, error) {
@@ -21,6 +23,7 @@ func getClightningConnection(cfg *clightningConfig) (*clightningConnection, erro
 	client.StartUp(cfg.RpcHost)
 
 	logger.Infow("Attempting to connect to c-lightning (please be patient)")
+	var key string
 	for {
 		info, err := client.GetInfo()
 		if err == nil {
@@ -29,6 +32,8 @@ func getClightningConnection(cfg *clightningConfig) (*clightningConnection, erro
 
 				continue
 			}
+
+			key = info.Id
 
 			logger.Infow("Connected to c-lightning", "key", info.Id)
 			break
@@ -39,22 +44,15 @@ func getClightningConnection(cfg *clightningConfig) (*clightningConnection, erro
 
 	return &clightningConnection{
 		client: client,
+		key:    key,
 	}, nil
 }
 
 func (l *clightningConnection) Close() {
 }
 
-func (l *clightningConnection) GetInfo() (*info, error) {
-	infoResp, err := l.client.GetInfo()
-	if err != nil {
-		return nil, err
-	}
-
-	return &info{
-		key:    infoResp.Id,
-		synced: infoResp.IsBitcoindSync(),
-	}, nil
+func (l *clightningConnection) Key() string {
+	return l.key
 }
 
 func (l *clightningConnection) Connect(key, address string) error {
