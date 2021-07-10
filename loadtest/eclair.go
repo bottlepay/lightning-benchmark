@@ -27,6 +27,8 @@ var (
 type eclairConnection struct {
 	client     *http.Client
 	host, pass string
+
+	key string
 }
 
 func getEclairConnection(cfg *eclairConfig) (*eclairConnection, error) {
@@ -40,13 +42,12 @@ func getEclairConnection(cfg *eclairConfig) (*eclairConnection, error) {
 
 	logger := log.With("host", cfg.RpcHost)
 
-	var key string
 	logger.Infow("Attempting to connect to eclair")
 	for {
 		info, err := conn.GetInfo()
 		if err == nil {
-			key = info.key
-			logger.Infow("Connected to eclair", "key", key)
+			conn.key = info.key
+			logger.Infow("Connected to eclair", "key", conn.key)
 			break
 		}
 
@@ -54,7 +55,7 @@ func getEclairConnection(cfg *eclairConfig) (*eclairConnection, error) {
 	}
 
 	wsServersLock.Lock()
-	_, running := wsServers[key]
+	_, running := wsServers[conn.key]
 	defer wsServersLock.Unlock()
 
 	if !running {
@@ -65,7 +66,7 @@ func getEclairConnection(cfg *eclairConfig) (*eclairConnection, error) {
 			}
 		}()
 
-		wsServers[key] = struct{}{}
+		wsServers[conn.key] = struct{}{}
 	}
 
 	return conn, nil
@@ -150,6 +151,10 @@ func (l *eclairConnection) call(method string, parameters map[string]string) (
 	}
 
 	return respBody, nil
+}
+
+func (l *eclairConnection) Key() string {
+	return l.key
 }
 
 func (l *eclairConnection) GetInfo() (*info, error) {
