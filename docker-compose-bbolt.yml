@@ -29,17 +29,32 @@ services:
       - lnd-bob:/cfg
     command: --tlsextradomain=lnd-bob --protocol.no-anchors
 
+  lnd-charlie:
+    restart: unless-stopped
+    image: lightninglabs/lnd:v0.12.1-beta
+    depends_on:
+      - bitcoind
+    ports:
+      - 5002:5000
+    volumes:
+      - ./lnd.conf:/root/.lnd/lnd.conf
+      - lnd-charlie:/cfg
+    command: --tlsextradomain=lnd-charlie
+
   loadtest:
     build: loadtest
     depends_on:
       - lnd-alice
       - lnd-bob
+      - lnd-charlie
     volumes:
       - lnd-alice:/lnd-alice
       - lnd-bob:/lnd-bob
+      - lnd-charlie:/lnd-charlie
       - ./${LOADTEST_CONFIG_FILE}:/loadtest.yml
 
 volumes:
   lnd-alice:
   lnd-bob:
+  lnd-charlie:
     

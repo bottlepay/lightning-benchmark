@@ -16,6 +16,9 @@ var loadCommand = cli.Command{
 }
 
 func load(_ *cli.Context) error {
+	log.Infow("Channel propagation delay")
+	time.Sleep(5 * time.Second)
+
 	cfg, err := loadConfig()
 	if err != nil {
 		return err

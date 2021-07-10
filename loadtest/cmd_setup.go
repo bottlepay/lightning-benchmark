@@ -73,26 +73,67 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
-	log.Infow("Fund sender")
+	type node struct {
+		client nodeInterface
+		host   string
+	}
+
+	var nodes []*node
+
 	senderClient, err := getNodeConnection(&cfg.Sender)
 	if err != nil {
 		return err
 	}
 	defer senderClient.Close()
+	nodes = append(nodes,
+		&node{
+			client: senderClient,
+			host:   cfg.Sender.Host,
+		},
+	)
 
-	addrResp, err := senderClient.NewAddress()
+	if cfg.Router.Host != "" {
+		routerClient, err := getNodeConnection(&cfg.Router)
+		if err != nil {
+			return err
+		}
+		defer routerClient.Close()
+		nodes = append(nodes,
+			&node{
+				client: routerClient,
+				host:   cfg.Router.Host,
+			},
+		)
+	}
+
+	receiverClient, err := getNodeConnection(&cfg.Receiver)
 	if err != nil {
 		return err
 	}
-	log.Infow("Generated funding address", "address", addrResp)
+	defer receiverClient.Close()
+	nodes = append(nodes,
+		&node{
+			client: receiverClient,
+			host:   cfg.Receiver.Host,
+		},
+	)
 
-	senderAddr, err := btcutil.DecodeAddress(addrResp, &chaincfg.RegressionNetParams)
-	if err != nil {
-		return err
-	}
-	_, err = bitcoindConn.GenerateToAddress(1, senderAddr, nil)
-	if err != nil {
-		return err
+	log.Infow("Fund wallets")
+	for _, n := range nodes[:len(nodes)-1] {
+		addrResp, err := n.client.NewAddress()
+		if err != nil {
+			return err
+		}
+		log.Infow("Generated funding address", "address", addrResp)
+
+		senderAddr, err := btcutil.DecodeAddress(addrResp, &chaincfg.RegressionNetParams)
+		if err != nil {
+			return err
+		}
+		_, err = bitcoindConn.GenerateToAddress(1, senderAddr, nil)
+		if err != nil {
+			return err
+		}
 	}
 
 	log.Infow("Mature coin")
@@ -101,33 +142,31 @@ func setup(_ *cli.Context) error {
 		return err
 	}
 
-	log.Infow("Wait for coin to appear in wallet")
-	if err := senderClient.HasFunds(); err != nil {
-		return err
+	log.Infow("Wait for coin to appear in wallets")
+	for _, n := range nodes[:len(nodes)-1] {
+		if err := n.client.HasFunds(); err != nil {
+			return err
+		}
 	}
-
-	receiverClient, err := getNodeConnection(&cfg.Receiver)
-	if err != nil {
-		return err
-	}
-	defer receiverClient.Close()
-
-	receiverKey := receiverClient.Key()
-	log.Infow("Receiver info", "pubkey", receiverKey)
 
 	log.Infow("Connecting peers")
-	err = senderClient.Connect(receiverKey, cfg.Receiver.Host)
-	if err != nil {
-		return err
+	for i, n := range nodes[:len(nodes)-1] {
+		err = n.client.Connect(nodes[i+1].client.Key(), nodes[i+1].host)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	// Open channels. Because the sender will always choose the channel with
-	// the highest balance, the channel will be utilized roughly equally.
+	// the highest balance, the channels will be utilized roughly equally.
 	log.Infow("Open channels", "channel_count", cfg.Channels, "capacity_sat", cfg.ChannelCapacitySat)
 	for i := 0; i < cfg.Channels; i++ {
-		err = senderClient.OpenChannel(receiverKey, cfg.ChannelCapacitySat)
-		if err != nil {
-			return err
+		for i, n := range nodes[:len(nodes)-1] {
+			err := n.client.OpenChannel(nodes[i+1].client.Key(), cfg.ChannelCapacitySat)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -138,15 +177,22 @@ func setup(_ *cli.Context) error {
 	}
 
 	log.Infow("Waiting for channels to become active")
-	for {
-		activeChannels, err := senderClient.ActiveChannels()
-		if err != nil {
-			return err
+	for i, n := range nodes {
+		expectedChannels := cfg.Channels
+		if i > 0 && i < len(nodes)-1 {
+			expectedChannels *= 2
 		}
-		if activeChannels == cfg.Channels {
-			break
+
+		for {
+			activeChannels, err := n.client.ActiveChannels()
+			if err != nil {
+				return err
+			}
+			if activeChannels == expectedChannels {
+				break
+			}
+			time.Sleep(time.Second)
 		}
-		time.Sleep(time.Second)
 	}
 
 	log.Infow("Channels active")
