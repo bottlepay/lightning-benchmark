@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -149,6 +150,7 @@ func (l *lndConnection) SendPayment(invoice string) error {
 		PaymentRequest:    invoice,
 		TimeoutSeconds:    60,
 		NoInflightUpdates: true,
+		FeeLimitSat:       1000,
 	})
 	if err != nil {
 		return err
@@ -160,7 +162,7 @@ func (l *lndConnection) SendPayment(invoice string) error {
 	}
 
 	if update.State != routerrpc.PaymentState_SUCCEEDED {
-		return errors.New("payment failed")
+		return fmt.Errorf("payment failed: %v", update.State)
 	}
 
 	return nil
