@@ -11,7 +11,11 @@ services:
     depends_on:
       - bitcoind
     volumes:
-      - ./eclair.conf:/data/eclair.conf
+      - ./eclair/eclair.conf:/data/eclair.conf
+      - ./eclair/logback.xml:/data/logback.xml
+    environment:
+      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml
+
 
   eclair-bob:
     restart: unless-stopped
@@ -19,7 +23,10 @@ services:
     depends_on:
       - bitcoind
     volumes:
-      - ./eclair.conf:/data/eclair.conf
+      - ./eclair/eclair.conf:/data/eclair.conf
+      - ./eclair/logback.xml:/data/logback.xml
+    environment:
+      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml
 
   loadtest:
      build: loadtest
