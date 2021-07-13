@@ -37,6 +37,11 @@ case $1 in
     export LOADTEST_CONFIG_FILE=loadtest-eclair.yml
     ;;
 
+  "eclair-postgres")
+    DOCKER_COMPOSE_FILE=docker-compose-eclair-postgres.yml
+    export LOADTEST_CONFIG_FILE=loadtest-eclair.yml
+    ;;
+
   *)
     echo "unknown configuration"
     exit 1
