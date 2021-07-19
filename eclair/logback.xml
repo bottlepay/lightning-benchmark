@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <withJansi>false</withJansi>
+        <encoder>
+            <pattern>%yellow(${HOSTNAME} %d) %highlight(%-5level) %replace(%logger{24}){'\$.*',''}%X{category}%X{nodeId}%X{channelId}%X{paymentHash}%.-11X{parentPaymentId}%.-11X{paymentId} - %msg%ex{12}%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${eclair.datadir:-${user.home}/.eclair}/eclair.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${eclair.datadir:-${user.home}/.eclair}/eclair.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 90 days' worth of history capped at 5 GB total size -->
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>5GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d %-5level %replace(%logger{24}){'\$.*',''}%X{category}%X{nodeId}%X{channelId}%X{paymentHash}%.-11X{parentPaymentId}%.-11X{paymentId} - %msg%ex{24}%n</pattern>
+        </encoder>
+    </appender>
+
+    <if condition='isDefined("eclair.printToConsole")'>
+        <then>
+            <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+                <encoder>
+                    <pattern>%d %-5level %replace(%logger{24}){'\$.*',''}%X{category}%X{nodeId}%X{channelId}%X{paymentHash}%.-11X{parentPaymentId}%.-11X{paymentId} - %msg%ex{24}%n</pattern>
+                </encoder>
+            </appender>
+            <root>
+                <appender-ref ref="CONSOLE"/>
+            </root>
+        </then>
+    </if>
+
+    <logger name="fr.acinq.eclair.Setup" level="INFO" />
+
+    <root level="WARN">
+        <appender-ref ref="ROLLING"/>
+    </root>
+
+</configuration>

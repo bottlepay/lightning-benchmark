@@ -7,19 +7,26 @@ services:
 
   eclair-alice:
     restart: unless-stopped
-    image: acinq/eclair:release-0.5.1
+    image: acinq/eclair:release-0.6.1
     depends_on:
       - bitcoind
     volumes:
-      - ./eclair.conf:/data/eclair.conf
+      - ./eclair/eclair.conf:/data/eclair.conf
+      - ./eclair/logback.xml:/data/logback.xml
+    environment:
+      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml
+
 
   eclair-bob:
     restart: unless-stopped
-    image: acinq/eclair:release-0.5.1
+    image: acinq/eclair:release-0.6.1
     depends_on:
       - bitcoind
     volumes:
-      - ./eclair.conf:/data/eclair.conf
+      - ./eclair/eclair.conf:/data/eclair.conf
+      - ./eclair/logback.xml:/data/logback.xml
+    environment:
+      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml
 
   loadtest:
      build: loadtest
