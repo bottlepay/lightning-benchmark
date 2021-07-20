@@ -5,28 +5,45 @@ services:
     volumes:
       - ./bitcoin.conf:/bitcoin/.bitcoin/bitcoin.conf
 
+  postgres-alice:
+    restart: unless-stopped
+    image: postgres:13
+    environment:
+      POSTGRES_DB: eclair
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpassword
+
+  postgres-bob:
+    restart: unless-stopped
+    image: postgres:13
+    environment:
+      POSTGRES_DB: eclair
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpassword
+
   eclair-alice:
     restart: unless-stopped
     image: acinq/eclair:release-0.6.1
     depends_on:
       - bitcoind
+      - postgres-alice
     volumes:
       - ./eclair/eclair.conf:/data/eclair.conf
       - ./eclair/logback.xml:/data/logback.xml
     environment:
-      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml
-
+      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml -Declair.db.driver=postgres -Declair.db.postgres.host=postgres-alice
 
   eclair-bob:
     restart: unless-stopped
     image: acinq/eclair:release-0.6.1
     depends_on:
       - bitcoind
+      - postgres-bob
     volumes:
       - ./eclair/eclair.conf:/data/eclair.conf
       - ./eclair/logback.xml:/data/logback.xml
     environment:
-      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml
+      JAVA_OPTS: -Dlogback.configurationFile=/data/logback.xml -Declair.db.driver=postgres -Declair.db.postgres.host=postgres-bob
 
   loadtest:
      build: loadtest
