@@ -2,7 +2,7 @@
 
 if [[ $1 == "" ]]
 then
-  echo "usage: run.sh lnd-bbolt | lnd-bbolt-keysend | lnd-etcd | lnd-etcd-cluster | clightning | eclair"
+  echo "usage: run.sh lnd-bbolt | lnd-bbolt-keysend | lnd-etcd | lnd-etcd-cluster | clightning | eclair | eclair-postgres"
   exit 0
 fi
 

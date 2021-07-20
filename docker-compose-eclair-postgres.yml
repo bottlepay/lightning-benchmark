@@ -7,7 +7,7 @@ services:
 
   postgres-alice:
     restart: unless-stopped
-    image: postgres
+    image: postgres:13
     environment:
       POSTGRES_DB: eclair
       POSTGRES_USER: pguser
@@ -15,7 +15,7 @@ services:
 
   postgres-bob:
     restart: unless-stopped
-    image: postgres
+    image: postgres:13
     environment:
       POSTGRES_DB: eclair
       POSTGRES_USER: pguser
