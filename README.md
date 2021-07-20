@@ -24,10 +24,10 @@ Configuration | Implementation | Backend | Channels | Workers | Options
 `lnd-etcd` | lnd 0.12.1  | single etcd instance | 10 | 100 |
 `lnd-etcd-cluster` | lnd 0.12.1  | three-instance etcd cluster | 10 | 100  |
 `clightning` | c-lightning 0.9.3 | sqlite | 1 <sup>[1]</sup> | 100 |
-`eclair` | eclair 0.5.1 | sqlite | 10 | 10  <sup>[2]</sup>|
+`eclair` | eclair 0.6.1 | sqlite | 10 | 100 |
+`eclair-postgres` | eclair 0.6.1 | postgres | 10 | 100 |
 
 <sup>1</sup> Multiple channels are not supported in c-lightning  
-<sup>2</sup> Reduced number of workers to prevent timeouts
 
 ## Results
 
@@ -39,10 +39,11 @@ Below are the test results after 10,000 payments on the following machine:
 
 | Configuration | Transactions / sec | Avg latency (sec) |
 |--|--|--|
+|`eclair`| 89 | 1.1 |
+|`eclair-postgres`| 46 | 2.1 |
 |`clightning`| 61 | 1.6  |
 |`lnd-bbolt-keysend`| 35 | 2.8 |
 |`lnd-bbolt`| 33 | 3.0 |
-|`eclair`| 12 | 0.8 |
 |`lnd-etcd`| 4 | 29.2 |
 |`lnd-etcd-cluster`| 4 | 31.8 |
 
