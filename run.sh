@@ -27,6 +27,11 @@ case $1 in
     export LOADTEST_CONFIG_FILE=loadtest-lnd.yml
     ;;
 
+  "lnd-etcd-routing")
+    DOCKER_COMPOSE_FILE=docker-compose-etcd.yml
+    export LOADTEST_CONFIG_FILE=loadtest-lnd-routing.yml
+    ;;
+
   "lnd-etcd-cluster")
     DOCKER_COMPOSE_FILE=docker-compose-etcd-cluster.yml
     export LOADTEST_CONFIG_FILE=loadtest-lnd.yml
