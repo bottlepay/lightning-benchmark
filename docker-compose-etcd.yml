@@ -7,32 +7,37 @@ services:
 
   etcd-alice:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
 
   etcd-bob:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
 
   lnd-alice:
     restart: unless-stopped
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        repo: https://github.com/guggero/lnd
+        checkout: b873ab8bdefe958ff6b09b3b0783394300a0955c
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -42,14 +47,15 @@ services:
       - lnd-alice:/cfg
     ports:
       - 5000:5000      
-    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice:2379 --db.etcd.disabletls
 
   lnd-bob:
     restart: unless-stopped
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        repo: https://github.com/guggero/lnd
+        checkout: b873ab8bdefe958ff6b09b3b0783394300a0955c
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -59,7 +65,7 @@ services:
       - lnd-bob:/cfg
     ports:
       - 5001:5000      
-    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob:2379 --db.etcd.disabletls
 
   loadtest:
     build: loadtest
