@@ -7,110 +7,116 @@ services:
 
   etcd-alice-1:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd-alice-1
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd-alice-1:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-alice-1:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
-      - ETCD_PEER_AUTO_TLS=true
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd-alice-1:2380
-      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-alice-1:2380
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-alice
-      - ETCD_INITIAL_CLUSTER=etcd-alice-1=https://etcd-alice-1:2380,etcd-alice-2=https://etcd-alice-2:2380,etcd-alice-3=https://etcd-alice-3:2380
+      - ETCD_INITIAL_CLUSTER=etcd-alice-1=http://etcd-alice-1:2380,etcd-alice-2=http://etcd-alice-2:2380,etcd-alice-3=http://etcd-alice-3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
 
   etcd-alice-2:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd-alice-2
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd-alice-2:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-alice-2:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
-      - ETCD_PEER_AUTO_TLS=true
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd-alice-2:2380
-      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-alice-2:2380
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-alice
-      - ETCD_INITIAL_CLUSTER=etcd-alice-1=https://etcd-alice-1:2380,etcd-alice-2=https://etcd-alice-2:2380,etcd-alice-3=https://etcd-alice-3:2380
+      - ETCD_INITIAL_CLUSTER=etcd-alice-1=http://etcd-alice-1:2380,etcd-alice-2=http://etcd-alice-2:2380,etcd-alice-3=http://etcd-alice-3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
 
   etcd-alice-3:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd-alice-3
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd-alice-3:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-alice-3:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
-      - ETCD_PEER_AUTO_TLS=true
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd-alice-3:2380
-      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-alice-3:2380
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-alice
-      - ETCD_INITIAL_CLUSTER=etcd-alice-1=https://etcd-alice-1:2380,etcd-alice-2=https://etcd-alice-2:2380,etcd-alice-3=https://etcd-alice-3:2380
+      - ETCD_INITIAL_CLUSTER=etcd-alice-1=http://etcd-alice-1:2380,etcd-alice-2=http://etcd-alice-2:2380,etcd-alice-3=http://etcd-alice-3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
 
   etcd-bob-1:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd-bob-1
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd-bob-1:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-bob-1:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
-      - ETCD_PEER_AUTO_TLS=true
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd-bob-1:2380
-      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-bob-1:2380
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-bob
-      - ETCD_INITIAL_CLUSTER=etcd-bob-1=https://etcd-bob-1:2380,etcd-bob-2=https://etcd-bob-2:2380,etcd-bob-3=https://etcd-bob-3:2380
+      - ETCD_INITIAL_CLUSTER=etcd-bob-1=http://etcd-bob-1:2380,etcd-bob-2=http://etcd-bob-2:2380,etcd-bob-3=http://etcd-bob-3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
 
   etcd-bob-2:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd-bob-2
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd-bob-2:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-bob-2:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
-      - ETCD_PEER_AUTO_TLS=true
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd-bob-2:2380
-      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-bob-2:2380
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-bob
-      - ETCD_INITIAL_CLUSTER=etcd-bob-1=https://etcd-bob-1:2380,etcd-bob-2=https://etcd-bob-2:2380,etcd-bob-3=https://etcd-bob-3:2380
+      - ETCD_INITIAL_CLUSTER=etcd-bob-1=http://etcd-bob-1:2380,etcd-bob-2=http://etcd-bob-2:2380,etcd-bob-3=http://etcd-bob-3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
 
   etcd-bob-3:
     restart: unless-stopped
-    image: 'bitnami/etcd:3.3.10'
+    image: 'bitnami/etcd:3.5.0'
     environment:
       - ALLOW_NONE_AUTHENTICATION=yes
       - ETCD_NAME=etcd-bob-3
-      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd-bob-3:2379
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-bob-3:2379
       - ETCD_MAX_TXN_OPS=16384
       - ETCD_MAX_REQUEST_BYTES=104857600
-      - ETCD_AUTO_TLS=true
-      - ETCD_PEER_AUTO_TLS=true
-      - ETCD_INITIAL_ADVERTISE_PEER_URLS=https://etcd-bob-3:2380
-      - ETCD_LISTEN_PEER_URLS=https://0.0.0.0:2380
+      - ETCD_LOG_LEVEL=error
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd-bob-3:2380
+      - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster-bob
-      - ETCD_INITIAL_CLUSTER=etcd-bob-1=https://etcd-bob-1:2380,etcd-bob-2=https://etcd-bob-2:2380,etcd-bob-3=https://etcd-bob-3:2380
+      - ETCD_INITIAL_CLUSTER=etcd-bob-1=http://etcd-bob-1:2380,etcd-bob-2=http://etcd-bob-2:2380,etcd-bob-3=http://etcd-bob-3:2380
       - ETCD_INITIAL_CLUSTER_STATE=new
 
   lnd-alice:
@@ -118,7 +124,8 @@ services:
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        repo: http://github.com/lightningnetwork/lnd
+        checkout: master
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -130,14 +137,15 @@ services:
       - lnd-alice:/cfg
     ports:
       - 5000:5000      
-    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice-1:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-alice --db.backend=etcd --db.etcd.host=etcd-alice-1:2379 --db.etcd.disabletls
 
   lnd-bob:
     restart: unless-stopped
     build: 
       context: lnd
       args:
-        checkout: v0.12.1-beta
+        repo: http://github.com/lightningnetwork/lnd
+        checkout: master
         tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_etcd
     depends_on:
       - bitcoind
@@ -149,7 +157,7 @@ services:
       - lnd-bob:/cfg
     ports:
       - 5001:5000      
-    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob-1:2379 --db.etcd.insecure_skip_verify
+    command: --tlsextradomain=lnd-bob --db.backend=etcd --db.etcd.host=etcd-bob-1:2379 --db.etcd.disabletls
 
   loadtest:
     build: loadtest
