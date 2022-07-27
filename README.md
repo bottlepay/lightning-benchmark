@@ -27,7 +27,8 @@ Configuration | Implementation | Backend | Channels | Workers | Options
 `eclair` | eclair 0.6.1 | sqlite | 10 | 100 |
 `eclair-postgres` | eclair 0.6.1 | postgres | 10 | 100 |
 
-<sup>1</sup> Multiple channels are not supported in c-lightning  
+<sup>1</sup> Multiple channels to the same node are not supported
+  in c-lightning
 
 ## Results
 
