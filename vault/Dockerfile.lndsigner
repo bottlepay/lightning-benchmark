@@ -1,0 +1,11 @@
+FROM golang:1.18.8-alpine3.15
+
+RUN apk add git
+
+WORKDIR /app
+
+RUN git clone https://github.com/bottlepay/lndsigner.git .
+RUN git checkout sidecar-signer
+
+RUN go build -o /bin/vault-plugin-lndsigner ./cmd/vault-plugin-lndsigner
+RUN go build -o /bin/lndsignerd ./cmd/lndsignerd

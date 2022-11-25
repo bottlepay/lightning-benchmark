@@ -64,3 +64,38 @@ following parameters are available:
 * `processes`: the number of parallel processes
 * `channels`: the number of channels between the two test nodes
 * `channelCapacitySat`: capacity of the channel(s)
+
+## Use vault
+
+### Vault setup
+
+* Start docker-compose in the `vault` dir: `docker-compose up -d`
+* Copy vault plugin out of container: `docker-compose cp lndsigner:/bin/vault-plugin-lndsigner vault_plugins/`
+* Download minio client: wget https://dl.min.io/client/mc/release/linux-amd64/mc
+* Define alias for this minio instance: `mc alias set local http://127.0.0.1:19000 ROOTUSER CHANGEME123`
+* Create bucket `vault-storage`: `mc mb local/vault-storage`
+* Restart `vault-server` container. Now that the bucket exists, it can start up properly.
+* Log into the vault server: `docker-compose exec vault-server sh`
+* Set the vault address: `export VAULT_ADDR=http://127.0.0.1:8200`
+* Init vault: `vault operator init -key-shares=1 -key-threshold=1`
+* Save token and unseal key
+* Unseal the vault with the unseal key: `vault operator unseal`
+* Set the token variable: `export VAULT_TOKEN=<token here>`
+* Get plugin sha256 hash for use in the next step: `sha256sum /vault/plugins/vault-plugin-lndsigner`
+* Register plugin: `vault plugin register --sha256 <sha256> secret vault-plugin-lndsigner`
+* Enable plugin: `vault secrets enable --path=lndsigner vault-plugin-lndsigner`
+* Create node: `vault write lndsigner/lnd-nodes network=regtest`
+* Update `signer.conf` with node key
+* Update `VAULT_TOKEN` in `vault/docker-compose.yml` with vault token
+* Restart lndsigner `docker-compose up -d`
+* `docker-compose logs -f lndsigner` should show that it is running properly
+
+### Run test
+
+* Go back to the root directory
+* Make sure nothing is running: `docker-compose -f docker-compose-bbolt.yml down -v --remove-orphans`
+* Start just Alice: `docker-compose -f docker-compose-bbolt.yml up -d lnd-alice`
+* Shell into Alice: `docker-compose -f docker-compose-bbolt.yml exec lnd-alice bash`
+* Create wallet: `lncli --network=regtest --tlscertpath=/cfg/tls.cert --macaroonpath=/cfg/admin.macaroon createwatchonly /lndsigner/accounts.json`
+* Now run the benchmark: `./run.sh lnd-bbolt`
+* Look at the `lndsigner` logs and see that it is working.

@@ -52,7 +52,7 @@ echo DOCKER_COMPOSE_FILE: $DOCKER_COMPOSE_FILE
 echo LOADTEST_CONFIG_FILE: $LOADTEST_CONFIG_FILE
 
 # Make sure that all leftovers from a previous run are removed. 
-docker-compose -f $DOCKER_COMPOSE_FILE down -v --remove-orphans
+# docker-compose -f $DOCKER_COMPOSE_FILE down -v --remove-orphans
 
 # Spin up the stack and output logs as a foreground process. Grep filters the
 # output to only show the test results.

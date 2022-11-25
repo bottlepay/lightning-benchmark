@@ -7,19 +7,24 @@ services:
 
   lnd-alice:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    image: lightninglabs/lnd:v0.15.4-beta
     depends_on:
       - bitcoind
     volumes:
-      - ./lnd.conf:/root/.lnd/lnd.conf
+      - ./lnd-vault.conf:/root/.lnd/lnd.conf
       - lnd-alice:/cfg
+      - vault_lndsigner:/lndsigner
+      - ./any.macaroon:/lndsigner/signer.macaroon
     ports:
       - 5000:5000
     command: --tlsextradomain=lnd-alice
 
+    # lncli --network=regtest --tlscertpath=/cfg/tls.cert --macaroonpath=/cfg/admin.macaroon createwatchonly /lndsigner/accounts.json
+    # lncli --network=regtest --tlscertpath=/cfg/tls.cert --macaroonpath=/cfg/admin.macaroon unlock
+
   lnd-bob:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    image: lightninglabs/lnd:v0.15.4-beta
     depends_on:
       - bitcoind
     ports:
@@ -42,4 +47,10 @@ services:
 volumes:
   lnd-alice:
   lnd-bob:
-    
+  vault_lndsigner:
+    external: true
+
+networks:
+  default:
+    name: vault
+    external: true
