@@ -7,7 +7,12 @@ services:
 
   lnd-alice:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    build:
+      context: lnd
+      args:
+        repo: https://github.com/ellemouton/lnd
+        checkout: 5c9f79dd42f4911ad5446be4066edfcf38a7e539
+        tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_sqlite
     depends_on:
       - bitcoind
     volumes:
@@ -15,11 +20,16 @@ services:
       - lnd-alice:/cfg
     ports:
       - 5000:5000
-    command: --tlsextradomain=lnd-alice
+    command: --tlsextradomain=lnd-alice --db.backend=sqlite --db.sqlite.pragmaoptions=synchronous=full --db.sqlite.maxconnections=2
 
   lnd-bob:
     restart: unless-stopped
-    image: lightninglabs/lnd:v0.12.1-beta
+    build:
+      context: lnd
+      args:
+        repo: https://github.com/ellemouton/lnd
+        checkout: 5c9f79dd42f4911ad5446be4066edfcf38a7e539
+        tags: signrpc walletrpc chainrpc invoicesrpc monitoring kvdb_sqlite
     depends_on:
       - bitcoind
     ports:
@@ -27,7 +37,7 @@ services:
     volumes:
       - ./lnd.conf:/root/.lnd/lnd.conf
       - lnd-bob:/cfg
-    command: --tlsextradomain=lnd-bob
+    command: --tlsextradomain=lnd-bob --db.backend=sqlite --db.sqlite.pragmaoptions=synchronous=full --db.sqlite.maxconnections=2
 
   loadtest:
     build: loadtest
