@@ -57,7 +57,7 @@ To display the profile in a browser, run:
 
 ## Configuration
 
-The `loadtest` container reads test parameters from the file `loadtest.yml` the
+The `loadtest` container reads test parameters from the file `loadtest.yml` (or the filename specified in the `CONFIG_FILE` environment variable) the
 following parameters are available:
 
 * `paymentAmountMsat`: the test amount that is paid
